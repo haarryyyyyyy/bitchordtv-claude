@@ -1,0 +1,15 @@
+{
+  "name": "bitchord-tv",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BitChord for Samsung TV (Tizen web app)",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "e2e": "node test/e2e.js",
+    "package": "node tools/package.js"
+  },
+  "devDependencies": {
+    "puppeteer-core": "24.10.0"
+  }
+}
