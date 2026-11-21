@@ -542,7 +542,7 @@
     });
     if (!out.length) throw new Error('No audio stream for this song');
     var vd = g(v, 'videoDetails') || {};
-    return { streams: out, title: vd.title || '', lengthSec: Number(vd.lengthSeconds) || 0 };
+    return { streams: out, title: vd.title || '', lengthSec: Number(vd.lengthSeconds) || 0, thumb: largest(arr(g(vd, 'thumbnail', 'thumbnails'))) };
   }
 
   // ---- API ----------------------------------------------------------------------------------

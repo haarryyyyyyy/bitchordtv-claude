@@ -63,6 +63,7 @@
       state.streamIndex = 0;
       state.duration = info.lengthSec || (t.duration || 0);
       if (!t.duration && info.lengthSec) t.duration = info.lengthSec;
+      if (!t.thumb && info.thumb) { t.thumb = info.thumb; BC.emit('track', t); }
       openStream(resumeAt || 0);
       BC.library.addHistory(t);
     }, function (e) {

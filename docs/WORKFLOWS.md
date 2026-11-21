@@ -1,6 +1,6 @@
 # Workflows
 
-Remote keys: arrows, OK, Back, Play/Pause, Play, Pause, Stop, Fast-forward, Rewind, the four color keys, 0–9 and Voice.
+Remote keys: arrows, OK, Back, Play/Pause, Play, Pause, Stop, Fast-forward, Rewind, the four color keys and 0–9. The app doesn't use the Voice key: no voice API for web apps has been tested on a TV yet.
 
 ## Global keys
 
@@ -48,7 +48,6 @@ The page shows new releases, then top songs (four-row grid), then charts playlis
 | 0–9 | Type the digit |
 | Rewind / Fast-forward | Move the cursor |
 | OK held | Repeats a character key |
-| Voice | Starts Samsung voice input when the TV offers it to apps; otherwise nothing happens |
 
 ## Album / playlist
 
@@ -66,10 +65,11 @@ The page shows the banner and name, then Play top songs and Start radio. Below t
 ## Play
 
 1. The queue is set and the first track's `/player` (VISIONOS) is requested.
-2. **Format:** the order is 251, then 140, then 139, filtered by `canPlayType`; a decode error tries the next format.
-3. **Mini player:** it appears at the bottom; OK on it opens Now Playing.
-4. **Next track:** 20 s before the end, the next track's player response is fetched (prefetch).
-5. **Queue end:** when autoplay is on, the radio of the last track is appended.
+2. **Now Playing opens:** the cover flies from the card or row you pressed.
+3. **Format:** the order is AAC 140, then 139, then Opus 251; a decode error tries the next format.
+4. **Mini player:** after Back it sits at the bottom of every page; OK on it opens Now Playing again.
+5. **Next track:** 20 s before the end, the next track's player response is fetched (prefetch).
+6. **Queue end:** when autoplay is on, the radio of the last track is appended.
 
 ## Now Playing
 

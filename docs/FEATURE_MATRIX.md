@@ -29,22 +29,24 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 | Now Playing: Up next (queue) | `queue.rs` | yes | Done | Panel beside the art. OK plays the focused song; long-press OK opens Remove and Play next. |
 | Mini player | `mini.rs` | yes | Done | Bar along the bottom of every page while something plays. OK opens Now Playing. |
 | Settings | `ui/mod.rs` settings | TvSettingsScreen | Done | Only the TV-relevant settings (list below). |
-| Connection check | — | — | Done | Every route tried, with its result, the platform version and codec support. Opens by itself when YouTube cannot be reached. |
+| Connection check | — | — | Done | Each recent request with its result, plus codec support. The "Unable to reach YouTube Music" error points to it. |
 
 ## Playback
 
 | Feature | PC | Tizen | Notes |
 |---|---|---|---|
 | VISIONOS `/player`, plain URLs, no PO token | `innertube.rs` | Done | Sent as a CORS-simple request. Visitor data from a WEB_REMIX browse is required, or YouTube answers "Sign in to confirm you're not a bot". |
-| Opus 251, then AAC 140, then 139 | `innertube.rs` | Done | `canPlayType` picks the order. A decode error moves to the next format automatically. |
+| Audio format | `innertube.rs` (Opus 251 first) | Partial | AAC 140, then 139, then Opus 251. On the Tizen 6.5 test TV Opus fails with a decode error although `canPlayType` answers "probably", so AAC goes first. A decode error still moves to the next format. |
 | Shuffle, repeat (off / all / one) | yes | Done | |
 | Autoplay (song radio when the queue ends) | `ytm.rs::radio` | Done | `RDAMVM<id>` with the PC's `params`. Music videos are dropped when songs exist, as on PC. |
 | Start radio from any song | yes | Done | Long-press OK › Start radio. |
 | Next-track prefetch | `stream.rs` | Done | The next song's `/player` response is fetched 20 s before the end. Stream URLs are only valid for a few hours, so they are fetched again when older than that. |
+| Background audio | yes | Partial | `background-support` is off, the setting the probe installed with. Audio may stop when you switch to another TV app. |
+| Early stream end | — | Done | The TV reported a 10 s duration for a 5 min AAC stream. Lengths come from YouTube's metadata, and a stream that ends early is reopened where it stopped. |
 | Volume normalization | `audio.rs` | Done | Gain from `loudnessDb`, falling back to the track loudness against −14 LUFS. Only turns the volume down, never above 1.0. |
 | Quality indicator | `quality` | Done | "Opus 160 kbps" or "AAC 128 kbps" in Now Playing. |
 | Sleep timer | yes | Done | 15, 30, 45 or 60 min, or end of song. |
-| SponsorBlock-style skip | `sponsorblock.rs` | Done | Same categories as PC (`music_offtopic`, `sponsor`, `selfpromo`, `interaction`), looked up by SHA-256 prefix, and only for music videos, as on PC. |
+| SponsorBlock-style skip | `sponsorblock.rs` | Removed | PC applies it only to music videos, and the radio already drops music videos when songs exist. Removed at the user's request to cut features that don't matter on TV. |
 | Crossfade, Automix | yes | Not possible | One hardware decoder on many TVs, so two overlapping `<audio>` streams are not reliable. |
 | Logarithmic volume, output device | yes | Not possible | The TV's own volume keys and audio output apply. |
 | Hi-res sources (Qobuz and similar) | `hires.rs` | Removed | Brief: hi-res addon sources. |
@@ -66,8 +68,6 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 |---|---|---|
 | Autoplay | Done | |
 | Volume normalization | Done | |
-| Skip non-music parts | Done | |
-| Audio format: Opus first / AAC only | Done | AAC only is for TVs that report Opus but fail to decode it. |
 | Animated background | Done | Off shows a still, blurred cover. |
 | Reduce motion | Done | Also follows `prefers-reduced-motion`. |
 | Lyrics: sources and their order, text size | Done | |
@@ -89,8 +89,10 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 | Hi-res addon sources | Not applicable on TV (brief). |
 | File uploads, Downloads page, download folder | No file system the user can browse; not applicable (brief). |
 | Proxy setting, signature service, yt-dlp, EJS solver | No proxy (brief). VISIONOS URLs need no signature solving. |
+| On-TV service app (tried in the probe) | It works, but it isn't needed: the page itself reads youtubei directly. Removed. |
 | Animated (motion) artwork | `motion.rs` fetches Apple HLS clips through Apple's web token. That needs `amp-api.music.apple.com` with a scraped token and an `Origin` header, which a page cannot send. |
 | Theme presets editor | One look, the PC default with the Apple Music lyric preset. |
+| Voice search | Not built: no Samsung voice API for web apps has been tested on a TV yet. Search uses the on-screen keyboard. |
 
 ## Signed-in features
 

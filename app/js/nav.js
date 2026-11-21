@@ -58,7 +58,10 @@
     var units = unitsOf(u);
     if (!units.length) return null;
     var pick = null;
-    var mem = memory[pathOf(u)];
+    // A group may name the child to enter first (the sidebar enters on the current section).
+    var prefer = u.getAttribute('data-prefer');
+    if (prefer) pick = units.filter(function (c) { return c.matches(prefer); })[0] || null;
+    var mem = pick ? undefined : memory[pathOf(u)];
     if (mem !== undefined) {
       for (var i = 0; i < units.length; i++) if (keyOf(units[i], i) === mem) { pick = units[i]; break; }
     }

@@ -65,7 +65,13 @@
         return;
       }
       var loading = false;
-      function add(shelves) {
+      function add(shelves, spread) {
+        // Shelves from a continuation go in one per frame, so a held arrow never stalls.
+        if (spread && shelves.length > 1) {
+          add(shelves.slice(0, 1));
+          BC.later(function () { if (ctx.alive()) add(shelves.slice(1), true); });
+          return;
+        }
         shelves.forEach(function (s) {
           var i = ctx.track.querySelectorAll('.shelf').length;
           var sec = ui.shelf(s, 'shelf:' + s.title, { hero: i === 0 });
@@ -83,7 +89,7 @@
         BC.yt.homeMore(d.continuation).then(function (m) {
           d.continuation = m.continuation;
           d.shelves = d.shelves.concat(m.shelves);
-          if (ctx.alive()) add(m.shelves);
+          if (ctx.alive()) add(m.shelves, true);
           loading = false;
         }, function () { loading = false; });
       }

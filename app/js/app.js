@@ -46,6 +46,7 @@
     nav.setAttribute('data-nav', 'v');
     nav.setAttribute('data-key', 'sidebar');
     nav.setAttribute('aria-label', 'Main');
+    nav.setAttribute('data-prefer', '.current');
     var brand = el('div', 'brand');
     brand.innerHTML = logoSvg('brand-mark');
     brand.appendChild(el('span', 'brand-word', 'BitChord'));

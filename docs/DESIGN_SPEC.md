@@ -91,7 +91,7 @@ The scale is 8, 12, 16, 24, 32, 48, 64 and 96.
 | Cover cross-fade | 0.45 s | `COVER_XFADE` |
 | Line-sync lead | 0.115 s, word-sync 0.150 s | `LINE_OFFSET`, `RICHSYNC_OFFSET` |
 
-**Focus** (**TV**): the card scales to 1.06 over 150 ms (`--ease-out`), and the 4 px ring takes the accent colour. Only transform and opacity animate. The ring is a pseudo-element faded by opacity, so nothing reflows.
+**Focus** (**TV**): the card scales to 1.06 over 150 ms (`--ease-out`), and its title moves down 14 px to clear it. A 4 px ring in `--text` (#F2F0F5) sits 8 px outside the art. White, not the accent, stays visible on pink covers. Rows, buttons and menu items fill with `--text` and switch to dark text. Only transform and opacity animate; the ring is a pseudo-element faded by opacity, so nothing reflows.
 
 **Page change:** the new page rises 24 px with opacity over 300 ms (×0.65 ≈ 200 ms). On Back the old page drops away the same way (spatial consistency).
 
@@ -104,8 +104,11 @@ The scale is 8, 12, 16, 24, 32, 48, 64 and 96.
 - **Shader:** the same fragment shader as PC: simplex-noise warp of the cover, vignette, saturation, dim, dither.
 - **Defaults:**
   - intensity 1.0, saturation 1.5, scale 1.2, speed 1.0;
-  - dim 0.85 in Now Playing (`np_dim`) and 0.5 behind pages (`page_dim`).
-- **TV:** rendered at 96×54 and scaled up to 1920×1080 by CSS. The bilinear upscale is the blur, so no `filter: blur()` runs on a moving surface. It renders at 30 fps and pauses when hidden or when the app is in the background.
+  - dim 0.85 in Now Playing (`np_dim`).
+- **TV:**
+  - Behind pages the dim is 0.3 (PC: 0.5); at 0.5, page text was hard to read across a room.
+  - The cover is uploaded as a 24 px texture, warped at 192×108 and scaled to 1920×1080 by CSS. The small texture and the bilinear upscale are the blur, so no `filter: blur()` runs on a moving surface. (96×54 with a 128 px texture showed blocky pixels.)
+  - It renders at 30 fps, holds a still frame under reduced motion, and pauses when the app is hidden.
 
 ## Lyrics (Apple Music preset, `presets.json`; behaviour from `karaoke.rs`)
 
