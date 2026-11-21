@@ -431,7 +431,8 @@
     ui = BC.ui;
     var a = document.createElement('audio');
     var info = el('div', 'diag-env');
-    info.textContent = navigator.userAgent + '\nAAC: “' + a.canPlayType('audio/mp4; codecs="mp4a.40.2"') + '” · Opus: “' + a.canPlayType('audio/webm; codecs="opus"') + '” · WebGL backdrop: ' + (BC.backdrop.webgl() ? 'yes' : 'no');
+    info.textContent = navigator.userAgent + '\nViewport ' + innerWidth + '×' + innerHeight + ' · screen ' + screen.width + '×' + screen.height + ' · pixel ratio ' + (window.devicePixelRatio || 1) +
+      '\nAAC: “' + a.canPlayType('audio/mp4; codecs="mp4a.40.2"') + '” · Opus: “' + a.canPlayType('audio/webm; codecs="opus"') + '” · Media Source: ' + (window.MediaSource ? 'yes' : 'no');
     ctx.track.appendChild(info);
     var list = el('div', 'diag');
     function paint() {

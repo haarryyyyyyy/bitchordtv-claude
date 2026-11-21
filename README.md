@@ -4,7 +4,7 @@ A Tizen port of [BitChord](https://github.com/jackychan4891/BitChord-PC-Official
 
 ![Home](docs/screenshots/home.png)
 
-**Status: 0.1.0, first test build.**
+**Status: 0.2.0, second test build.**
 - **Verified on a TV** (Tizen 6.5): every request the app makes works from a packaged app, and AAC playback works. The probe in [`probe/`](probe/) checked this.
 - **Verified in a headless browser:** the full app, with real YouTube data and the arrow keys as a remote.
 - **Not yet run on a TV:** the full app itself. Please report what you see.
@@ -33,14 +33,14 @@ The release `.wgt` is **unsigned**. Samsung TVs only install apps signed with yo
    ```
 
 4. **Certificate:** in Tizen Studio's Certificate Manager, use the `bctv` Samsung TV profile you made for the probe, or create one with the TV connected.
-5. Download `BitChord-0.1.0-unsigned.wgt` from [Releases](../../releases), then sign, install and start it:
+5. Download `BitChord-0.2.0-unsigned.wgt` from [Releases](../../releases), then sign, install and start it:
 
    ```bash
-   C:\tizen-studio\tools\ide\bin\tizen.bat package -t wgt -s bctv -- BitChord-0.1.0-unsigned.wgt
+   C:\tizen-studio\tools\ide\bin\tizen.bat package -t wgt -s bctv -- BitChord-0.2.0-unsigned.wgt
    ```
 
    ```bash
-   C:\tizen-studio\tools\ide\bin\tizen.bat install -n BitChord-0.1.0-unsigned.wgt -t <target>
+   C:\tizen-studio\tools\ide\bin\tizen.bat install -n BitChord-0.2.0-unsigned.wgt -t <target>
    ```
 
    ```bash
@@ -67,7 +67,7 @@ The app's package ID (`bchordtv01`) differs from the probe's, so both can stay i
 | Red / Green / Yellow / Blue | On the keyboard: Shift, Clear, Space, Search. |
 | 0–9 | On the keyboard: type a digit. |
 
-Starting a song opens Now Playing. Back leaves it, and the mini player at the bottom brings it back. Likes, saved albums and playlists, and history are kept on the TV. Signing in with a YouTube account isn't available yet (see below).
+Starting a song opens Now Playing. Back leaves it. To return, press Left for the sidebar and choose **Now Playing** at the top. Likes, saved albums and playlists, and history are kept on the TV. Signing in with a YouTube account isn't available yet (see below).
 
 ## Develop
 

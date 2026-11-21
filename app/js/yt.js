@@ -535,6 +535,7 @@
       out.push({
         itag: itag, url: f.url, opus: itag === 251,
         mime: f.mimeType || '',
+        initRange: f.initRange || null, indexRange: f.indexRange || null,
         kbps: Math.round((f.averageBitrate || f.bitrate || 0) / 1000),
         durationMs: Number(f.approxDurationMs) || 0,
         loudnessDb: loud

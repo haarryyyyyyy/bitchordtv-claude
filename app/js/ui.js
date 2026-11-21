@@ -43,6 +43,7 @@
     b.setAttribute('role', 'button');
     b.setAttribute('data-key', key || name);
     label(b, name);
+    b.setAttribute('data-label', name); // shown under the icon while focused
     b.appendChild(BC.icon(icon));
     b.onActivate = action;
     return b;
@@ -312,7 +313,7 @@
     if (!toastEl) {
       toastEl = el('div', 'toast');
       toastEl.setAttribute('role', 'status');
-      document.body.appendChild(toastEl);
+      (document.getElementById('stage') || document.body).appendChild(toastEl);
     }
     toastEl.textContent = text;
     toastEl.classList.add('in');

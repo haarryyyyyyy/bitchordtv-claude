@@ -101,7 +101,12 @@ The scale is 8, 12, 16, 24, 32, 48, 64 and 96.
 
 ## Backdrop (`shader.rs`, preset defaults)
 
-- **Shader:** the same fragment shader as PC: simplex-noise warp of the cover, vignette, saturation, dim, dither.
+- **TV (0.2.0):** PC's warp shader was replaced after the first TV test, where it looked poor.
+  - Once per song, the cover is drawn twice into a 160×90 canvas: once large, and once turned half round at 65% opacity. Both draws use `blur(10px) saturate(1.6)`.
+  - CSS scales the canvas past the screen edges and drifts it over 48 s with `transform` (scale up to 1.12, a 4° turn).
+  - Two canvases cross-fade over 0.9 s between songs.
+  - A `#0C0A0E` scrim sits on top: 0.84 opacity behind pages, 0.42 in Now Playing.
+- **PC values, for reference:** the PC fragment shader does a simplex-noise warp of the cover, with vignette, saturation, dim and dither.
 - **Defaults:**
   - intensity 1.0, saturation 1.5, scale 1.2, speed 1.0;
   - dim 0.85 in Now Playing (`np_dim`).

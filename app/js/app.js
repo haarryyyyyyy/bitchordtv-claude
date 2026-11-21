@@ -3,7 +3,7 @@
   'use strict';
   var BC = root.BC;
   var el = BC.el;
-  BC.VERSION = '0.1.0';
+  BC.VERSION = '0.2.0';
 
   // Remote keys (Samsung TV key codes; arrows, Enter and Escape also work on a PC keyboard).
   var KEYS = {
@@ -51,6 +51,22 @@
     brand.innerHTML = logoSvg('brand-mark');
     brand.appendChild(el('span', 'brand-word', 'BitChord'));
     nav.appendChild(brand);
+    // Now Playing, reachable from every page with Left: shown once something plays.
+    var npItem = el('div', 'nav-item nav-np fx');
+    npItem.setAttribute('role', 'button');
+    npItem.setAttribute('data-key', 'nowplaying');
+    npItem.setAttribute('aria-label', 'Now Playing');
+    npItem.setAttribute('data-skip', '');
+    var npArt = el('img', 'nav-np-art');
+    npArt.alt = '';
+    npItem.appendChild(npArt);
+    npItem.appendChild(el('span', 'nav-label', 'Now Playing'));
+    npItem.onActivate = function () { BC.nowPlaying.open(npArt.getBoundingClientRect()); };
+    nav.appendChild(npItem);
+    BC.on('track', function (t) {
+      npItem.removeAttribute('data-skip');
+      npArt.src = BC.sized(t.thumb, 96);
+    });
     shell.navItems = {};
     NAV.forEach(function (n) {
       var b = el('div', 'nav-item fx');
@@ -313,7 +329,17 @@
     }, total);
   }
 
+  /** Scale the 1920×1080 stage to the viewport the TV reports, centred. */
+  function fit() {
+    var w = root.innerWidth || 1920, h = root.innerHeight || 1080;
+    var s = Math.min(w / 1920, h / 1080);
+    var stage = document.getElementById('stage');
+    stage.style.transform = 'translate(' + Math.round((w - 1920 * s) / 2) + 'px,' + Math.round((h - 1080 * s) / 2) + 'px) scale(' + s + ')';
+  }
+
   function boot() {
+    fit();
+    root.addEventListener('resize', fit);
     // One by one: a batch with a single key the model lacks can fail as a whole.
     try {
       var supported = tizen.tvinputdevice.getSupportedKeys().map(function (k) { return k.name; });

@@ -26,9 +26,11 @@
     left.appendChild(parts.cover);
     parts.title = el('div', 'np-title');
     parts.artist = el('div', 'np-artist');
+    parts.album = el('div', 'np-album');
     parts.quality = el('div', 'np-quality');
     left.appendChild(parts.title);
     left.appendChild(parts.artist);
+    left.appendChild(parts.album);
 
     // The progress bar is focusable: left and right seek while it has focus.
     var prog = el('div', 'np-progress fx');
@@ -53,6 +55,7 @@
     prog.onActivate = function () { BC.player.toggle(); };
     left.appendChild(prog);
 
+    // One transport row: the big Play in the middle, secondary actions after a divider.
     var row = el('div', 'np-transport');
     row.setAttribute('data-nav', 'h');
     row.setAttribute('data-key', 'transport');
@@ -63,19 +66,29 @@
     parts.play.classList.add('np-play');
     parts.next = ui.iconButton('next', 'Next', BC.player.next, 'next');
     parts.repeat = ui.iconButton('repeat', 'Repeat', function () { BC.toast({ off: 'Repeat off', all: 'Repeat all', one: 'Repeat one' }[BC.player.cycleRepeat()]); }, 'repeat');
-    parts.lyricsBtn = ui.iconButton('lyrics', 'Lyrics', function () { show('lyrics'); }, 'lyrics');
-    parts.queueBtn = ui.iconButton('list', 'Up next', function () { show('queue'); }, 'queue');
     parts.like = ui.iconButton('heart', 'Like', function () {
       var t = BC.player.current();
       if (t) BC.toast(BC.library.toggleLike(t) ? 'Added to liked songs' : 'Removed from liked songs');
       paintState();
     }, 'like');
     parts.sleep = ui.iconButton('moon', 'Sleep timer', sleepMenu, 'sleep');
-    [parts.shuffle, parts.prev, parts.play, parts.next, parts.repeat, el('i', 'np-sep'), parts.lyricsBtn, parts.queueBtn, parts.like, parts.sleep].forEach(function (b) { row.appendChild(b); });
+    [parts.shuffle, parts.prev, parts.play, parts.next, parts.repeat, el('i', 'np-sep'), parts.like, parts.sleep].forEach(function (b) { row.appendChild(b); });
     left.appendChild(row);
 
     var right = el('div', 'np-right');
+    right.setAttribute('data-nav', 'v');
+    right.setAttribute('data-key', 'right');
     parts.right = right;
+    // Tabs say plainly what the panel can show.
+    var tabs = el('div', 'np-tabs');
+    tabs.setAttribute('data-nav', 'h');
+    tabs.setAttribute('data-key', 'tabs');
+    parts.lyricsBtn = ui.button('Lyrics', 'lyrics', function () { show('lyrics'); }, 'np-tab', 'tab-lyrics');
+    parts.queueBtn = ui.button('Up next', 'list', function () { show('queue'); }, 'np-tab', 'tab-queue');
+    tabs.appendChild(parts.lyricsBtn);
+    tabs.appendChild(parts.queueBtn);
+    right.appendChild(tabs);
+    var panelBox = el('div', 'np-panel');
     parts.lyrics = el('div', 'lyrics');
     parts.lyricsTrack = el('div', 'lyrics-track');
     parts.lyricsTrack.setAttribute('data-nav', 'v');
@@ -83,9 +96,10 @@
     parts.lyrics.appendChild(parts.lyricsTrack);
     parts.lyricsSource = el('div', 'lyrics-source');
     parts.queue = el('div', 'np-queue');
-    right.appendChild(parts.lyrics);
-    right.appendChild(parts.lyricsSource);
-    right.appendChild(parts.queue);
+    panelBox.appendChild(parts.lyrics);
+    panelBox.appendChild(parts.lyricsSource);
+    panelBox.appendChild(parts.queue);
+    right.appendChild(panelBox);
     np.appendChild(left);
     np.appendChild(right);
     document.getElementById('np-host').appendChild(np);
@@ -114,6 +128,7 @@
     if (!np || !t) return;
     parts.title.textContent = t.title;
     parts.artist.textContent = BC.artistLine(t);
+    parts.album.textContent = t.album && t.album.name ? t.album.name : '';
     var url = BC.sized(t.thumb, 840);
     if (parts.coverImg.getAttribute('src') !== url) {
       parts.coverImg.classList.remove('loaded');
@@ -130,6 +145,7 @@
     var playing = BC.player.playing();
     parts.play.querySelector('.ic').textContent = BC.ICON[playing ? 'pause' : 'play'];
     parts.play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    parts.play.setAttribute('data-label', playing ? 'Pause' : 'Play');
     np.classList.toggle('loading', BC.player.loading());
     parts.shuffle.classList.toggle('on', BC.player.shuffle());
     var rep = BC.player.repeat();
@@ -234,12 +250,12 @@
   function renderQueue() {
     var q = BC.player.upNext(), pos = BC.player.pos();
     parts.queue.innerHTML = '';
-    parts.queue.appendChild(el('h2', 'np-queue-title', 'Up next'));
     var list = el('div', 'np-queue-list');
     list.setAttribute('data-nav', 'v');
     list.setAttribute('data-key', 'queue');
     var sc = BC.ui.scroller('y', list);
     sc.classList.add('np-queue-scroll');
+    sc.setAttribute('data-pad', '24');
     var from = Math.max(0, pos), shown = q.slice(from, from + 60);
     if (shown.length <= 1) list.appendChild(el('div', 'side-empty', BC.settings.get('autoplay') ? 'Similar songs will play after this one.' : 'Nothing else is queued.'));
     shown.forEach(function (t, k) {
@@ -313,7 +329,8 @@
     /** Back inside Now Playing: leave the lyrics or queue first, then close. */
     back: function () {
       var f = BC.nav.focused();
-      if (f && parts.right.contains(f)) { BC.nav.focus(parts.play); userScrollAt = 0; tick(true); return; }
+      if (f && parts.right.contains(f) && f !== parts.lyricsBtn && f !== parts.queueBtn) { BC.nav.focus(panel === 'queue' ? parts.queueBtn : parts.lyricsBtn); userScrollAt = 0; tick(true); return; }
+      if (f && parts.right.contains(f)) { BC.nav.focus(parts.play); return; }
       BC.nowPlaying.close();
     }
   };

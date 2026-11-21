@@ -12,7 +12,7 @@ module.exports.launch = async function (query = '') {
   const browser = await puppeteer.launch({
     executablePath: CHROME, headless: 'new',
     args: ['--disable-web-security', '--user-data-dir=' + path.join(require('os').tmpdir(), 'bctv-e2e'), '--autoplay-policy=no-user-gesture-required', '--window-size=1920,1080'],
-    defaultViewport: { width: 1920, height: 1080 }
+    defaultViewport: { width: Number(process.env.VW || 1920), height: Number(process.env.VH || 1080) }
   });
   const page = await browser.newPage();
   const errors = [];

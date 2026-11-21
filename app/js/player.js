@@ -37,12 +37,22 @@
     audio.volume = BC.settings.get('normalize') && typeof db === 'number' && db > 0 ? Math.pow(10, -db / 20) : 1;
   }
 
+  var mse = null;
   function openStream(at) {
     var s = state.streams[state.streamIndex];
     if (!s) return false;
     state.stream = s;
-    audio.src = s.url;
-    if (at) audio.currentTime = at;
+    if (mse) { mse.destroy(); mse = null; }
+    if (BC.mse.supported(s)) {
+      // Fragment by fragment: a plain src stops after the first ~10 s fragment on Tizen.
+      mse = BC.mse.attach(audio, s, at, function () {
+        state.streamIndex++;
+        if (!openStream(audio.currentTime || at)) { setLoading(false); BC.emit('toast', 'Unable to play this song on this TV'); if (hasNext()) setTimeout(next, 1500); }
+      });
+    } else {
+      audio.src = s.url;
+      if (at) audio.currentTime = at;
+    }
     applyVolume();
     var p = audio.play();
     if (p && p.catch) p.catch(function () { /* autoplay refusal: the user presses Play */ });

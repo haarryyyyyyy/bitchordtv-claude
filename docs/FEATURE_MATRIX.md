@@ -24,10 +24,10 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 | Artist | `ytm.rs::artist` | TvArtistPage | Done | Banner, top songs, albums, singles, playlists, similar artists. |
 | Library: playlists, songs, albums, history | `pages.rs::library` (signed in) | TvLibraryScreen | Partial | Kept on this TV: liked songs, saved albums and playlists, history. Syncing with a YouTube account is blocked on sign-in (see below). |
 | Library: uploads | `ytm.rs::uploads` | — | Not possible | Needs a signed-in account. |
-| Now Playing: cover backdrop, accent from cover | `nowplaying.rs`, `shader.rs` | TvNowPlayingScreen | Done | The PC warp shader runs in WebGL on a 96×54 canvas scaled up by CSS, which supplies the blur. Without WebGL, a 2D canvas fallback drifts the scaled cover. |
+| Now Playing: cover backdrop, accent from cover | `nowplaying.rs`, `shader.rs` | TvNowPlayingScreen | Partial | Not PC's warp shader: in WebGL it looked poor on the test TV. The cover is blurred once per song into a small canvas and drifted slowly with CSS transforms, an Apple-Music-style soft field. |
 | Now Playing: synced lyrics, word timing | `karaoke.rs`, `lyrics.rs` | TvNowPlayingParts | Done | Word-timed lines light up word by word. Upcoming lines blur, past lines fade, and the active line sits at the 0.43 anchor. |
 | Now Playing: Up next (queue) | `queue.rs` | yes | Done | Panel beside the art. OK plays the focused song; long-press OK opens Remove and Play next. |
-| Mini player | `mini.rs` | yes | Done | Bar along the bottom of every page while something plays. OK opens Now Playing. |
+| Mini player | `mini.rs` | yes | Done | **Now Playing** sits at the top of the sidebar once something plays, reachable from any page with Left then Up. A bar at the bottom of each page also shows the song. |
 | Settings | `ui/mod.rs` settings | TvSettingsScreen | Done | Only the TV-relevant settings (list below). |
 | Connection check | — | — | Done | Each recent request with its result, plus codec support. The "Unable to reach YouTube Music" error points to it. |
 
@@ -42,7 +42,7 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 | Start radio from any song | yes | Done | Long-press OK › Start radio. |
 | Next-track prefetch | `stream.rs` | Done | The next song's `/player` response is fetched 20 s before the end. Stream URLs are only valid for a few hours, so they are fetched again when older than that. |
 | Background audio | yes | Partial | `background-support` is off, the setting the probe installed with. Audio may stop when you switch to another TV app. |
-| Early stream end | — | Done | The TV reported a 10 s duration for a 5 min AAC stream. Lengths come from YouTube's metadata, and a stream that ends early is reopened where it stopped. |
+| Fragmented streams | — | Done | YouTube's audio formats are fragmented MP4 (an index, then about 10 s fragments). On the Tizen 6.5 test TV a plain `<audio src>` stopped after the first fragment, so audio is fed through Media Source Extensions: the index (sidx) is parsed, and fragments are fetched with `&range=`, about 60 s ahead, dropping what is 60 s behind. Seeking fetches from the right fragment. |
 | Volume normalization | `audio.rs` | Done | Gain from `loudnessDb`, falling back to the track loudness against −14 LUFS. Only turns the volume down, never above 1.0. |
 | Quality indicator | `quality` | Done | "Opus 160 kbps" or "AAC 128 kbps" in Now Playing. |
 | Sleep timer | yes | Done | 15, 30, 45 or 60 min, or end of song. |
