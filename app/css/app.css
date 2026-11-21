@@ -415,7 +415,8 @@ img { display: block; }
 .reduce-motion .splash-mark-host, .reduce-motion .splash-mark .arc, .reduce-motion .splash-word { animation: none; }
 .reduce-motion .splash-sheen { display: none; }
 .reduce-motion .np-cover { transition: none; }
+.reduce-motion .kb-caret, .reduce-motion .sk-title, .reduce-motion .sk-card, .reduce-motion .np.loading .np-cover, .reduce-motion .mini.loading .mini-art { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .card.focused .card-art, .btn.focused, .chip.focused, .tile.focused, .kb-key.focused, .synced .lyric.on { transform: none; }
-  .splash-mark-host, .splash-mark .arc, .splash-word, .splash-sheen { animation: none; }
+  .splash-mark-host, .splash-mark .arc, .splash-word, .splash-sheen, .kb-caret, .sk-title, .sk-card { animation: none; }
 }

@@ -15,7 +15,7 @@
   var state = {
     queue: [], order: [], pos: -1,     // order: indexes into queue (shuffle permutes it)
     shuffle: false, repeat: 'off',      // 'off' | 'all' | 'one'
-    stream: null, streams: [], streamIndex: 0, loading: false,
+    stream: null, streams: [], streamIndex: 0, loading: false, reopens: 0, reopenAt: -1,
     duration: 0, sleepAt: 0, sleepEnd: false, radioFor: null
   };
   var prefetched = {};   // videoId -> { at, info }
@@ -61,6 +61,7 @@
       if (seq !== loadSeq) return;
       state.streams = info.streams;
       state.streamIndex = 0;
+      state.reopens = 0; state.reopenAt = -1;
       state.duration = info.lengthSec || (t.duration || 0);
       if (!t.duration && info.lengthSec) t.duration = info.lengthSec;
       if (!t.thumb && info.thumb) { t.thumb = info.thumb; BC.emit('track', t); }
@@ -99,7 +100,13 @@
   audio.addEventListener('ended', function () {
     var t = audio.currentTime;
     // The TV's player can stop at a segment boundary: reopen at the same point if the song has more.
-    if (state.duration && t < state.duration - 5) { openStream(t); return; }
+    if (state.duration && t < state.duration - 5) {
+      // Reopen where it stopped, but never loop: give up if a reopen made no progress.
+      if (state.reopens < 3 && t > state.reopenAt + 1) { state.reopens++; state.reopenAt = t; openStream(t); return; }
+      BC.emit('toast', 'This song stopped early on this TV; playing the next one');
+      if (hasNext()) next();
+      return;
+    }
     if (state.sleepEnd) { state.sleepEnd = false; BC.emit('sleep', null); return; }
     if (state.repeat === 'one') { audio.currentTime = 0; audio.play(); return; }
     if (hasNext()) next();

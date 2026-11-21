@@ -70,7 +70,7 @@
   }
 
   /** visionOS player (innertube.rs): plain stream URLs, no cipher, no PO token. Needs visitor data. */
-  function player(videoId) {
+  function player(videoId, retried) {
     var ready = visitorData ? Promise.resolve() : ytm('browse', { browseId: 'FEmusic_home' });
     return ready.then(function () {
       var body = {
@@ -78,7 +78,17 @@
         videoId: videoId, contentCheckOk: true, racyCheckOk: true
       };
       return request('POST', 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false', JSON.stringify(body), 'player');
-    }).then(function (r) { return parse(r, 'player'); });
+    }).then(function (r) {
+      var json = parse(r, 'player');
+      // "Sign in to confirm you're not a bot": this visitor ID is flagged. Start a new one, once.
+      var st = json.playabilityStatus || {};
+      if (!retried && (st.status === 'LOGIN_REQUIRED' || /bot/i.test(st.reason || ''))) {
+        visitorData = '';
+        BC.store.remove('visitorData');
+        return player(videoId, true);
+      }
+      return json;
+    });
   }
 
   function get(url, name) {

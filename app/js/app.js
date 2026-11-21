@@ -88,6 +88,7 @@
     var m = el('div', 'mini');
     m.setAttribute('data-nav', 'h');
     m.setAttribute('data-key', 'mini');
+    m.setAttribute('data-skip', ''); // invisible until something plays: never focusable
     var open = el('div', 'mini-open fx');
     open.setAttribute('role', 'button');
     open.setAttribute('data-key', 'open');
@@ -110,6 +111,7 @@
     m.appendChild(bar);
     BC.on('track', function (t) {
       document.body.classList.add('has-mini');
+      m.removeAttribute('data-skip');
       title.textContent = t.title;
       sub.textContent = BC.artistLine(t);
       open.setAttribute('aria-label', 'Now Playing: ' + t.title + ', ' + BC.artistLine(t));
@@ -237,7 +239,8 @@
     var f = BC.nav.focused();
 
     if (name === 'ok') {
-      if (okDown) return;            // auto-repeat: the timers decide
+      if (e.repeat) return;          // auto-repeat: the timers decide
+      clearTimeout(okTimer); clearInterval(okRepeat); // a lost keyup must not lock OK
       okDown = true;
       okConsumed = false;
       if (f && f.repeat) {
@@ -311,7 +314,11 @@
   }
 
   function boot() {
-    try { tizen.tvinputdevice.registerKeyBatch(TIZEN_KEYS); } catch (e) { /* not a TV */ }
+    // One by one: a batch with a single key the model lacks can fail as a whole.
+    try {
+      var supported = tizen.tvinputdevice.getSupportedKeys().map(function (k) { return k.name; });
+      TIZEN_KEYS.forEach(function (k) { if (supported.indexOf(k) >= 0) { try { tizen.tvinputdevice.registerKey(k); } catch (e) { /* skip */ } } });
+    } catch (e) { /* not a TV */ }
     if (BC.reducedMotion()) document.body.classList.add('reduce-motion');
     BC.on('settings', function (k) { if (k === 'reduceMotion') document.body.classList.toggle('reduce-motion', BC.reducedMotion()); });
     BC.backdrop.init(document.getElementById('bg'));
