@@ -31,7 +31,7 @@ The TV browser is Chromium 76 on Tizen 6 (Chromium 63 on Tizen 5, 56 on Tizen 4)
 | `--menu` | `#26222A` | Menus, the keyboard (`menu_fill`) |
 | `--on-text` | `#0F0F0F` | Text on a fill of `--text` (`on_text`) |
 | `--glass-N` | `rgba(255,255,255,N)` | Glass surfaces (`glass(a)`) |
-| `--shade-N` | `rgba(0,0,0,N)` | Panels (`shade(a)`): sidebar 0.28, player bar 0.55 |
+| `--shade-N` | `rgba(0,0,0,N)` | Panels (`shade(a)`): PC sidebar 0.28, player bar 0.55 |
 
 The app is dark only, as the PC's Now Playing always is. The PC default "System" mode follows Windows, which a TV has no equivalent of.
 
@@ -77,7 +77,7 @@ The scale is 8, 12, 16, 24, 32, 48, 64 and 96.
 
 - **Shelves:** 64 apart, title to items 20, cards 32 apart (PC 20 × 1.6, **TV**: the focus scale needs room).
 - **Rows:** song-row height is 96 (PC `ROW_H` 56, **TV**: a 10-foot target).
-- **Sidebar:** 340 wide expanded, 128 collapsed (PC `SIDEBAR_W` 236 / `RAIL_W` 76 at 1.45×).
+- **Top bar (TV):** 72 tall at 40 px from the top, inside the 96 px side margins. Player pill 440 wide, then text tabs 56 tall. Pages start at 152 px. PC uses a sidebar (`SIDEBAR_W` 236); a top bar keeps the full width for rows and puts the player in reach.
 
 ## Motion (`theme.rs`, `karaoke.rs`)
 

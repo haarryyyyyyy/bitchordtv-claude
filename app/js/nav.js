@@ -58,7 +58,7 @@
     var units = unitsOf(u);
     if (!units.length) return null;
     var pick = null;
-    // A group may name the child to enter first (the sidebar enters on the current section).
+    // A group may name the child to enter first (the top bar enters on the current tab).
     var prefer = u.getAttribute('data-prefer');
     if (prefer) pick = units.filter(function (c) { return c.matches(prefer); })[0] || null;
     var mem = pick ? undefined : memory[pathOf(u)];

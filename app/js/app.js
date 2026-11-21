@@ -1,9 +1,9 @@
-/* App shell: sidebar, router with history, mini player and remote keys. */
+/* App shell: top bar with the player pill, router with history, and remote keys. */
 (function (root) {
   'use strict';
   var BC = root.BC;
   var el = BC.el;
-  BC.VERSION = '0.4.0';
+  BC.VERSION = '0.5.0';
 
   // Remote keys (Samsung TV key codes; arrows, Enter and Escape also work on a PC keyboard).
   var KEYS = {
@@ -29,7 +29,7 @@
   var current = null;    // { entry, root, alive, onFocus, keyHandler, onLeave }
   var seq = 0;
   var shell = {};
-  var sideChosen = false;
+  var barChosen = false;
 
   // ---- Shell ------------------------------------------------------------------------------
   function logoSvg(cls) {
@@ -41,60 +41,50 @@
 
   function buildShell() {
     var app = document.getElementById('app');
-    var nav = el('nav', 'sidebar');
-    nav.setAttribute('data-nav', 'v');
-    nav.setAttribute('data-key', 'sidebar');
-    nav.setAttribute('aria-label', 'Main');
-    nav.setAttribute('data-prefer', '.current');
+    // Top bar: the player pill (or the brand, before anything plays) on the left, tabs beside it.
+    var bar = el('header', 'topbar');
+    bar.setAttribute('data-nav', 'h');
+    bar.setAttribute('data-key', 'topbar');
+    bar.setAttribute('data-prefer', '.current'); // Up from a page lands on the current tab
     var brand = el('div', 'brand');
     brand.innerHTML = logoSvg('brand-mark');
     brand.appendChild(el('span', 'brand-word', 'BitChord'));
-    nav.appendChild(brand);
-    // Now Playing, reachable from every page with Left: shown once something plays.
-    var npItem = el('div', 'nav-item nav-np fx');
-    npItem.setAttribute('role', 'button');
-    npItem.setAttribute('data-key', 'nowplaying');
-    npItem.setAttribute('aria-label', 'Now Playing');
-    npItem.setAttribute('data-skip', '');
-    var npArt = el('img', 'nav-np-art');
-    npArt.alt = '';
-    npItem.appendChild(npArt);
-    npItem.appendChild(el('span', 'nav-label', 'Now Playing'));
-    npItem.onActivate = function () { BC.nowPlaying.open(npArt.getBoundingClientRect()); };
-    nav.appendChild(npItem);
-    BC.on('track', function (t) {
-      npItem.removeAttribute('data-skip');
-      npArt.src = BC.sized(t.thumb, 96);
-    });
+    bar.appendChild(brand);
+    bar.appendChild(buildMini());
+    var tabs = el('nav', 'tabs');
+    tabs.setAttribute('aria-label', 'Main');
     shell.navItems = {};
     NAV.forEach(function (n) {
-      var b = el('div', 'nav-item fx');
+      var b = el('div', 'tab fx', n.label);
       b.setAttribute('role', 'link');
       b.setAttribute('data-key', n.id);
-      b.setAttribute('aria-label', n.label);
-      b.appendChild(BC.icon(n.icon));
-      b.appendChild(el('span', 'nav-label', n.label));
       b.onActivate = function () { go(n.id); };
-      nav.appendChild(b);
+      tabs.appendChild(b);
       shell.navItems[n.id] = b;
     });
-    var main = el('main', 'main');
-    main.setAttribute('data-nav', 'v');
-    main.setAttribute('data-key', 'main');
-    shell.pageHost = el('div', 'page-host');
-    main.appendChild(shell.pageHost);
-    main.appendChild(buildMini());
+    bar.appendChild(tabs);
+    shell.pageHost = el('main', 'page-host');
     var body = el('div', 'shell');
-    body.setAttribute('data-nav', 'h');
+    body.setAttribute('data-nav', 'v');
     body.setAttribute('data-key', 'shell');
-    body.appendChild(nav);
-    body.appendChild(main);
+    body.appendChild(bar);
+    body.appendChild(shell.pageHost);
     app.appendChild(body);
-    shell.sidebar = nav;
+    shell.bar = bar;
     BC.nav.onFocus(function (f) {
-      var inSide = nav.contains(f);
-      document.body.classList.toggle('side-open', inSide);
-      if (current && current.onFocus && !inSide) current.onFocus(f);
+      var inBar = bar.contains(f);
+      if (inBar) {
+        document.body.classList.remove('bar-away');
+        // Back at the top bar: the page returns to its top too.
+        if (current && current.track.__off) BC.nav.setOffset(current.track, 'y', 0);
+      }
+      if (current && current.onFocus && !inBar) current.onFocus(f);
+    });
+    // The bar slides away once a page scrolls, and returns at the top or when focused.
+    BC.on('scrolled', function (e) {
+      if (e.axis !== 'y' || !e.track.classList.contains('page-track')) return;
+      var f = BC.nav.focused();
+      document.body.classList.toggle('bar-away', e.offset > 40 && !(f && bar.contains(f)));
     });
   }
 
@@ -102,6 +92,7 @@
   function buildMini() {
     var m = el('div', 'mini');
     m.setAttribute('data-nav', 'h');
+    m.setAttribute('aria-label', 'Player');
     m.setAttribute('data-key', 'mini');
     m.setAttribute('data-skip', ''); // invisible until something plays: never focusable
     var open = el('div', 'mini-open fx');
@@ -119,9 +110,6 @@
     m.appendChild(open);
     var play = BC.ui.iconButton('play', 'Play', BC.player.toggle, 'play');
     m.appendChild(play);
-    var bar = el('div', 'mini-bar'), fill = el('div', 'mini-fill');
-    bar.appendChild(fill);
-    m.appendChild(bar);
     BC.on('track', function (t) {
       document.body.classList.add('has-mini');
       m.removeAttribute('data-skip');
@@ -134,14 +122,10 @@
     });
     BC.on('state', function () {
       var p = BC.player.playing();
-      play.querySelector('.ic').textContent = BC.ICON[p ? 'pause' : 'play'];
+      BC.setIcon(play, p ? 'pause' : 'play');
       play.setAttribute('aria-label', p ? 'Pause' : 'Play');
       play.setAttribute('data-label', p ? 'Pause' : 'Play');
       m.classList.toggle('loading', BC.player.loading());
-    });
-    BC.on('time', function (t) {
-      var d = BC.player.duration();
-      fill.style.transform = 'scaleX(' + (d ? Math.min(1, t / d) : 0) + ')';
     });
     return m;
   }
@@ -156,12 +140,14 @@
     var old = current;
     if (old && old.onLeave) old.onLeave();
     var title = entry.params.title || BC.viewTitles[entry.view] || '';
-    var pg = BC.ui.page(entry.key, entry.view === 'search' ? '' : title);
+    // Top-level pages need no heading: the highlighted tab names them.
+    var pg = BC.ui.page(entry.key, shell.navItems[entry.view] ? '' : title);
     var ctx = { entry: entry, root: pg.root, track: pg.track, alive: function () { return ctx === current; } };
     current = ctx;
     document.title = (title ? title + ' · ' : '') + 'BitChord';
     pg.root.classList.add('enter', direction === 'back' ? 'from-back' : 'from-fwd');
     shell.pageHost.appendChild(pg.root);
+    document.body.classList.remove('bar-away'); // a new page starts at its top, with the bar shown
     if (old) {
       var gone = old.root;
       gone.classList.add('leave', direction === 'back' ? 'to-back' : 'to-fwd');
@@ -193,7 +179,7 @@
   }
   /** Go to a top-level section: the stack starts over from it. */
   function go(view) {
-    sideChosen = false;
+    barChosen = false;
     if (current && current.entry.view === view && stack.length === 1) { settle(); return; }
     stack = [];
     open(view, {});
@@ -201,9 +187,9 @@
   function afterRender(entry) {
     BC.later(function () { if (current.entry === entry) settle(); });
   }
-  /** Focus the page (through its focus memory) unless the user is choosing in the sidebar. */
+  /** Focus the page (through its focus memory) unless the user is choosing in the top bar. */
   function settle() {
-    if (sideChosen || BC.nav.hasLayer() || BC.nowPlaying.isOpen()) return;
+    if (barChosen || BC.nav.hasLayer() || BC.nowPlaying.isOpen()) return;
     var g = current.track;
     // A page still loading has nothing to focus yet; its data arriving calls settle again.
     if (g.querySelector('.fx')) BC.nav.focusKey(g.parentElement, g.getAttribute('data-key'));
@@ -213,7 +199,7 @@
     stack.pop();
     var entry = stack[stack.length - 1];
     render(entry, 'back');
-    sideChosen = false;
+    barChosen = false;
     afterRender(entry);
     return true;
   }
@@ -224,14 +210,14 @@
     afterRender(entry);
   }
 
-  // ---- Back: close overlay > leave Now Playing > go up > sidebar > confirm exit ----------------------
+  // ---- Back: close overlay > leave Now Playing > go up > top bar > confirm exit ----------------------
   function handleBack() {
     var top = BC.nav.topLayer();
     if (top && top.close) { top.close(); return; }
     if (BC.nowPlaying.isOpen()) { BC.nowPlaying.back(); return; }
     var f = BC.nav.focused();
     if (back()) return;
-    if (f && !shell.sidebar.contains(f)) { BC.nav.focus(shell.navItems[rootViewOf(current.entry)]); return; }
+    if (f && !shell.bar.contains(f)) { BC.nav.focus(shell.navItems[rootViewOf(current.entry)]); return; }
     if (current.entry.view !== 'home') { go('home'); return; }
     BC.confirm({ title: 'Exit BitChord?', body: BC.player.playing() ? 'Playback stops when you exit.' : '', confirm: 'Exit', onConfirm: exit });
   }
@@ -293,9 +279,9 @@
       held.last = now;
       if (f && f.onKey && f.onKey(name)) return;
       BC.nav.move(name);
-      // The sidebar keeps focus only when an arrow press took the user there.
+      // The top bar keeps focus only when an arrow press took the user there.
       var g = BC.nav.focused();
-      sideChosen = !!(g && shell.sidebar.contains(g));
+      barChosen = !!(g && shell.bar.contains(g));
     }
   }
   function onKeyUp(e) {

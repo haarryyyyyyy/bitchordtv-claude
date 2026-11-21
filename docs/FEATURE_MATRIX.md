@@ -13,7 +13,7 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 
 | Screen | PC | Android TV | Tizen | Notes |
 |---|---|---|---|---|
-| Splash | — | TvStartup | Removed | Felt laggy on the test TV. Home opens at once with its loading skeleton; the brand mark sits in the sidebar. |
+| Splash | — | TvStartup | Removed | Felt laggy on the test TV. Home opens at once with its loading skeleton; the brand mark sits in the top bar. |
 | Home: mood chips, shelves, quick picks, continuation | `pages.rs::home`, `ytm.rs::home/home_more` | TvHomeScreen | Done | Chips re-request the feed with the chip's `params`. More shelves load as focus nears the end. Song shelves come before playlist shelves. Without an account, "Picked for you" (the radio of the last song played) and "Listen again" (history on the TV) lead the feed. |
 | New: new releases, top songs, charts | `pages.rs::new` | TvExploreScreen | Done | `FEmusic_new_releases_albums` and `FEmusic_charts` (US). |
 | Moods & genres | Home chips | TvExploreScreen | Done | `FEmusic_moods_and_genres` tiles open a browse page. |
@@ -27,7 +27,7 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 | Now Playing: cover backdrop, accent from cover | `nowplaying.rs`, `shader.rs` | TvNowPlayingScreen | Partial | Not PC's warp shader: in WebGL it looked poor on the test TV. The cover is blurred once per song into a small canvas and drifted slowly with CSS transforms, an Apple-Music-style soft field. |
 | Now Playing: synced lyrics, word timing | `karaoke.rs`, `lyrics.rs` | TvNowPlayingParts | Done | Word-timed lines light up word by word. Upcoming lines blur, past lines fade, and the active line sits at the 0.43 anchor. |
 | Now Playing: Up next (queue) | `queue.rs` | yes | Done | Panel beside the art. OK plays the focused song; long-press OK opens Remove and Play next. |
-| Mini player | `mini.rs` | yes | Done | **Now Playing** sits at the top of the sidebar once something plays, reachable from any page. A compact pill at the bottom right shows the song, with Play/Pause. |
+| Mini player | `mini.rs` | yes | Done | A player pill at the top left of the top bar: cover, title and Play/Pause. OK opens Now Playing. The top bar (pill, then Home, New, Search, Library and Settings tabs) replaces PC's sidebar and slides away while a page scrolls. |
 | Settings | `ui/mod.rs` settings | TvSettingsScreen | Done | Only the TV-relevant settings (list below). |
 | Connection check | — | — | Done | Each recent request with its result, plus codec support. The "Unable to reach YouTube Music" error points to it. |
 

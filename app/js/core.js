@@ -12,32 +12,29 @@
     return e;
   };
 
-  // Lucide glyphs from the PC app's icon font (theme.rs `icon` module).
-  BC.ICON = {
-    home: '', compass: '', library: '', search: '',
-    left: '', right: '', up: '', down: '',
-    play: '', pause: '', prev: '', next: '', shuffle: '',
-    heart: '', list: '', x: '', history: '', trash: '',
-    more: '', listPlus: '', radio: '', disc: '', user: '',
-    settings: '', music: '', sparkles: '', check: '',
-    repeat: '', repeat1: '', lyrics: '', plus: '', loader: '',
-    thumbsDown: ''
+  // Icons: inline SVG from app/js/icons.js (Lucide), plus two Lucide shapes the PC's subset
+  // font lacks. SVG, not font glyphs: glyphs drifted off-centre with text metrics.
+  var EXTRA = {
+    moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
+    del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></svg>'
   };
-  // Not in the PC's subset font: Lucide `moon` and `delete` paths (ISC licence).
-  var SVG = {
-    moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
-    del: '<path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/>'
-  };
+  function svgFor(name) {
+    if (EXTRA[name]) return EXTRA[name];
+    var d = BC.ICON_PATHS && BC.ICON_PATHS[name];
+    // The 24-unit stroke thickens Lucide's 2 px lines to about 2.5 px, matching the 600-weight labels.
+    return '<svg viewBox="0 0 1000 1000" fill="currentColor" stroke="currentColor" stroke-width="24" stroke-linejoin="round"><path d="' + (d || '') + '"/></svg>';
+  }
   BC.icon = function (name, cls) {
-    var i;
-    if (SVG[name]) {
-      i = BC.el('span', 'ic ic-svg' + (cls ? ' ' + cls : ''));
-      i.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + SVG[name] + '</svg>';
-    } else {
-      i = BC.el('span', 'ic' + (cls ? ' ' + cls : ''), BC.ICON[name] || '');
-    }
+    var i = BC.el('span', 'ic' + (cls ? ' ' + cls : ''));
     i.setAttribute('aria-hidden', 'true');
+    i.innerHTML = svgFor(name);
+    i.__name = name;
     return i;
+  };
+  /** Swap the icon inside `host` (play/pause, repeat/repeat-one). */
+  BC.setIcon = function (host, name) {
+    var i = host.querySelector('.ic');
+    if (i && i.__name !== name) { i.innerHTML = svgFor(name); i.__name = name; }
   };
 
   // ---- Images (model.rs `sized`) --------------------------------------------------------

@@ -177,6 +177,15 @@
     var head = el('div', 'shelf-head');
     if (s.strapline) head.appendChild(el('div', 'shelf-strap', s.strapline));
     if (s.title) head.appendChild(el('h2', 'shelf-title', s.title));
+    // Buttons that act on the whole shelf sit right beside its title.
+    if (opts.actions) {
+      head.classList.add('shelf-head-actions');
+      var acts = el('div', 'actions');
+      acts.setAttribute('data-nav', 'h');
+      acts.setAttribute('data-key', key + ':actions');
+      opts.actions.forEach(function (b) { acts.appendChild(b); });
+      head.appendChild(acts);
+    }
     if (s.title || s.strapline) sec.appendChild(head);
     var track = el('div', 'shelf-track');
     track.setAttribute('data-nav', 'h');
@@ -211,7 +220,7 @@
     var s = scroller('y', track);
     s.classList.add('page');
     s.setAttribute('data-pad', '120');
-    s.setAttribute('data-pad-end', '220'); // clear of the floating mini player
+    s.setAttribute('data-pad-end', '96');
     return { root: s, track: track };
   }
 
@@ -282,7 +291,7 @@
       b.setAttribute('data-key', 'm' + i);
       if (it.icon) b.appendChild(BC.icon(it.icon));
       b.appendChild(el('span', '', it.label));
-      if (it.on) b.classList.add('on');
+      if (it.on) { b.classList.add('on'); b.appendChild(BC.icon('check', 'menu-check')); }
       b.onActivate = function () { panel.close(); it.run(); };
       panel.appendChild(b);
     });

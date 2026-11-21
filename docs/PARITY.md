@@ -18,7 +18,7 @@ Short form of [FEATURE_MATRIX.md](FEATURE_MATRIX.md), which gives each reason in
   - [x] soft cover-colour backdrop and cover accent (PC shader replaced, see Partial);
   - [x] synced lyrics with word timing, blur on upcoming lines, the 0.43 anchor, instrumental gaps;
   - [x] Up next and the quality label.
-- [x] Now Playing in the sidebar and a compact mini player; the cover flies into Now Playing
+- [x] Top bar with a player pill at the top left that opens Now Playing; the cover flies in
 - [x] Lyrics: Unison, then lrc.red, then LRCLIB, order set in Settings
 - [x] Settings: autoplay, normalization, quality label, lyric sources and size, animated background, reduce motion, clear history and library, connection check, about
 - [x] Remote:

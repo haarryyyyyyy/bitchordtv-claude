@@ -164,14 +164,14 @@
   function paintState() {
     if (!np) return;
     var playing = BC.player.playing();
-    parts.play.querySelector('.ic').textContent = BC.ICON[playing ? 'pause' : 'play'];
+    BC.setIcon(parts.play, playing ? 'pause' : 'play');
     parts.play.setAttribute('aria-label', playing ? 'Pause' : 'Play');
     parts.play.setAttribute('data-label', playing ? 'Pause' : 'Play');
     np.classList.toggle('loading', BC.player.loading());
     parts.shuffle.classList.toggle('on', BC.player.shuffle());
     var rep = BC.player.repeat();
     parts.repeat.classList.toggle('on', rep !== 'off');
-    parts.repeat.querySelector('.ic').textContent = BC.ICON[rep === 'one' ? 'repeat1' : 'repeat'];
+    BC.setIcon(parts.repeat, rep === 'one' ? 'repeat1' : 'repeat');
     var t = BC.player.current();
     parts.like.classList.toggle('on', !!(t && BC.library.isLiked(t.id)));
     parts.sleep.classList.toggle('on', !!BC.player.sleepState());

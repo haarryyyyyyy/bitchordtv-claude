@@ -63,7 +63,7 @@ The page shows the banner and name, then Play top songs and Start radio. Below t
 1. The queue is set and the first track's `/player` (VISIONOS) is requested.
 2. **Now Playing opens:** the cover flies from the card or row you pressed.
 3. **Format:** the order is AAC 140, then 139, then Opus 251; a decode error tries the next format.
-4. **Back to Now Playing:** from any page, press Left to the sidebar and choose **Now Playing** at the top.
+4. **Back to Now Playing:** from any page, press Up to the top bar, then Left to the player pill, and press OK.
 5. **Next track:** 20 s before the end, the next track's player response is fetched (prefetch).
 6. **Queue end:** when autoplay is on, the radio of the last track is appended.
 

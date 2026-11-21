@@ -370,17 +370,10 @@
       return;
     }
     if (liked.length) {
-      var sec = el('section', 'shelf');
-      sec.setAttribute('data-row', '');
-      var head = el('div', 'shelf-head shelf-head-actions');
-      head.appendChild(el('h2', 'shelf-title', 'Liked songs'));
-      head.appendChild(actionsRow([
+      ctx.track.appendChild(ui.shelf({ title: 'Liked songs', kind: 'songs', items: liked, rows: 4 }, 'liked', { actions: [
         ui.button('Play', 'play', function () { BC.player.playList(liked, 0); }, 'btn-primary btn-small', 'play-liked'),
         ui.button('Shuffle', 'shuffle', function () { BC.player.playList(liked, 0, { shuffle: true }); }, 'btn-small', 'shuffle-liked')
-      ]));
-      sec.appendChild(head);
-      ctx.track.appendChild(sec);
-      ctx.track.appendChild(ui.shelf({ title: '', kind: 'songs', items: liked, rows: 4 }, 'liked'));
+      ] }));
     }
     if (saved.length) ctx.track.appendChild(ui.shelf({ title: 'Albums and playlists', kind: 'cards', items: saved }, 'saved'));
     if (history.length) ctx.track.appendChild(ui.shelf({ title: 'Recently played', kind: 'songs', items: history.slice(0, 60), rows: 4 }, 'history'));

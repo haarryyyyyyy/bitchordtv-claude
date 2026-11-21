@@ -27,7 +27,7 @@ A YouTube Music player for Samsung Smart TVs, designed for the remote. A Tizen p
 - Every screen works with the arrow keys, OK and Back. Each row remembers where you were, holding an arrow speeds up, and holding OK opens a menu of actions.
 - An on-screen keyboard in English, German, Spanish, French and Russian, plus symbols.
 - Media keys work everywhere, and number keys type on the keyboard.
-- Now Playing is always one press away from the sidebar.
+- A player pill at the top left shows the song and opens Now Playing from any page.
 - A reduced-motion setting, and accessible labels on every control.
 
 **Library on the TV**
