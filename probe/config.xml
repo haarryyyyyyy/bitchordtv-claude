@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- BitChord TV network probe. GPL-3.0, derived from BitChord (jackychan4891/BitChord-PC-Official). -->
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets"
+        id="http://bitchord.tv/probe" version="0.1.0" viewmodes="maximized">
+  <tizen:application id="bcprobe001.BitChordProbe" package="bcprobe001" required_version="3.0"/>
+  <tizen:profile name="tv-samsung"/>
+  <name>BitChord Probe</name>
+  <icon src="icon.png"/>
+  <content src="index.html"/>
+  <access origin="*" subdomains="true"/>
+  <tizen:privilege name="http://tizen.org/privilege/internet"/>
+  <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+  <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+  <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+  <!-- Experimental: an on-TV service app in the same package (option 2). -->
+  <tizen:service id="bcprobe001.ProbeService" auto-restart="false" on-boot="false">
+    <tizen:content src="service/service.js"/>
+    <tizen:name>ProbeService</tizen:name>
+    <tizen:icon src="icon.png"/>
+    <tizen:description>BitChord probe service</tizen:description>
+  </tizen:service>
+</widget>
