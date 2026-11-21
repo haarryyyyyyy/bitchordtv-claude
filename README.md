@@ -1,114 +1,69 @@
 # BitChord for Samsung TV
 
-A Tizen port of [BitChord](https://github.com/jackychan4891/BitChord-PC-Official) for Samsung TVs, built for the remote. It plays music from YouTube Music, with word-synced lyrics and BitChord's cover-driven backdrop. There's no server: the TV talks to YouTube Music directly.
+A YouTube Music player for Samsung Smart TVs, designed for the remote. A Tizen port of [BitChord](https://github.com/jackychan4891/BitChord-PC-Official).
 
 ![Home](docs/screenshots/home.png)
 
-**Status: 0.3.0, third test build.**
-- **Verified on a TV** (Tizen 6.5): every request the app makes works from a packaged app, and AAC playback works. The probe in [`probe/`](probe/) checked this.
-- **Verified in a headless browser:** the full app, with real YouTube data and the arrow keys as a remote.
-- **Not yet run on a TV:** the full app itself. Please report what you see.
-
 | | |
 |---|---|
-| ![Now Playing with lyrics](docs/screenshots/lyrics.png) | ![Search](docs/screenshots/search.png) |
+| ![Now Playing with lyrics](docs/screenshots/lyrics.png) | ![Now Playing without lyrics](docs/screenshots/now-playing.png) |
 
-## Install on your TV
+## Features
 
-The release `.wgt` is **unsigned**. Samsung TVs only install apps signed with your own Samsung certificate, which carries your TV's ID (DUID). Sign it the same way as the probe.
+**Listening**
+- Home feed with mood chips, plus "Picked for you" and "Listen again", learned from what you play on the TV.
+- New releases, charts, and moods & genres.
+- Album, playlist and artist pages.
+- Search with live suggestions and recent searches. Results show songs only, never videos.
+- Autoplay continues with similar songs when the queue ends.
 
-1. Install Tizen Studio with **Samsung TV Extensions** and **Samsung Certificate Extension** (Package Manager).
-2. **Developer Mode:**
-   1. On the TV, open Apps and press `1 2 3 4 5`.
-   2. Switch Developer mode On and enter your PC's IP address.
-   3. Restart the TV.
-3. Connect, then note the target name the second command prints (for example `UE55CU7100`):
+**Now Playing**
+- The background is a soft, slowly moving colour field taken from the cover.
+- Synced lyrics light up word by word where the source has word timing. Upcoming lines are softly blurred, Apple Music style.
+- Hide the lyrics for a large cover beside the song details, or switch to Up next.
+- Shuffle, repeat, like, a sleep timer, and a seek bar that marks your position clearly.
 
-   ```bash
-   C:\tizen-studio\tools\sdb.exe connect <TV_IP>
-   ```
+**Built for the TV**
+- Every screen works with the arrow keys, OK and Back. Each row remembers where you were, holding an arrow speeds up, and holding OK opens a menu of actions.
+- An on-screen keyboard in English, German, Spanish, French and Russian, plus symbols.
+- Media keys work everywhere, and number keys type on the keyboard.
+- Now Playing is always one press away from the sidebar.
+- A reduced-motion setting, and accessible labels on every control.
 
-   ```bash
-   C:\tizen-studio\tools\sdb.exe devices
-   ```
+**Library on the TV**
+- Liked songs, saved albums and playlists, and listening history, stored on the TV with no account needed.
 
-4. **Certificate:** in Tizen Studio's Certificate Manager, use the `bctv` Samsung TV profile you made for the probe, or create one with the TV connected.
-5. Download `BitChord-0.3.0-unsigned.wgt` from [Releases](../../releases), then sign, install and start it:
+## How it works
 
-   ```bash
-   C:\tizen-studio\tools\ide\bin\tizen.bat package -t wgt -s bctv -- BitChord-0.3.0-unsigned.wgt
-   ```
+The app talks to YouTube Music directly from the TV. It has no server or proxy and collects no data.
 
-   ```bash
-   C:\tizen-studio\tools\ide\bin\tizen.bat install -n BitChord-0.3.0-unsigned.wgt -t <target>
-   ```
+- **Music:** catalogue requests use YouTube Music's own web API. Audio streams as AAC, fed fragment by fragment through Media Source Extensions, so long songs play and seek reliably on Tizen.
+- **Lyrics:** from Unison, lrc.red and LRCLIB, three free community sources that need no key.
+- **Runtime:** plain JavaScript (ES2017) with no build step, written for Tizen 4.0 and later.
 
-   ```bash
-   C:\tizen-studio\tools\ide\bin\tizen.bat run -p bchordtv01.BitChord -t <target>
-   ```
+## Requirements
 
-   If the first command won't sign the downloaded file, unzip it into a folder named `app` and run `tizen.bat package -t wgt -s bctv -- app` instead.
+- A Samsung Smart TV running Tizen 4.0 or later (2018 models and newer). Tested on Tizen 6.5.
+- Developer Mode on the TV, and Tizen Studio with a Samsung certificate on a computer.
 
-The app's package ID (`bchordtv01`) differs from the probe's, so both can stay installed.
+## Installation
 
-**Emulator:** start a TV emulator in Emulator Manager and use its target name (for example `emulator-26101`). Emulators can treat network requests and codecs differently from a real TV.
+Each [release](../../releases) is an unsigned `.wgt`. Samsung TVs only install apps signed for that specific TV, so sign the package with your own Samsung TV certificate in Tizen Studio, then install it over Developer Mode.
 
-**Debugging on the TV:** `sdb shell 0 debug bchordtv01.BitChord` prints a port. Open `http://<TV_IP>:<port>` in Chrome for DevTools.
+## Limitations
 
-## Using it
+- **No account sign-in.** Google's sign-in can't run inside a Tizen web app. The library is stored on the TV instead.
+- **Playback stops in the background.** Music may stop when you switch to another TV app.
+- **Lyrics coverage.** Lyrics come from community sources, and some songs have none.
 
-| Key | What it does |
-|---|---|
-| Arrows | Move. Hold to go faster. |
-| OK | Open or play. Hold for half a second to open a menu: Play next, Add to queue, Start radio, Like, Save, Go to artist. |
-| Back | Close a menu, then leave Now Playing, then go up a page, then (on Home) ask to exit. |
-| Play/Pause, Stop, Next, Previous | Control playback from any screen. |
-| Fast-forward / Rewind | Seek 10 s; on the keyboard, move the cursor. |
-| 0–9 | On the keyboard: type a digit. |
+## Credits
 
-Starting a song opens Now Playing. Back leaves it. To return, press Left for the sidebar and choose **Now Playing** at the top. Likes, saved albums and playlists, and history are kept on the TV. Signing in with a YouTube account isn't available yet (see below).
-
-## Develop
-
-The app is plain JavaScript (ES2017) with no build step, so it runs on Tizen 4 and later. The widget lives in `app/`.
-
-To run it in Chrome as the TV would, start the dev server:
-
-```bash
-npx -y http-server@14.1.1 . -p 5180 -c-1 -s
-```
-
-Then open `http://localhost:5180/app/index.html` in a Chrome started with `--disable-web-security --user-data-dir=<temp folder>`. The flag stands in for the TV, which doesn't block cross-origin replies for packaged apps. It's a test-only flag; the app itself has no proxy.
-
-| Command | What it does |
-|---|---|
-| `npm test` | Parser tests on real YouTube captures, lyric parsers, the nav engine and keyboard (headless Chrome), and a gate against anything Chromium 76 can't run |
-| `node test/journey.js` | Walks every screen with the arrow keys and saves 1920×1080 screenshots to `test/shots/` (needs the dev server) |
-| `node test/perf.js` | Start-up time, frame rate and memory with the CPU slowed 6× |
-| `node tools/icons.js` | Renders the icon, store icons, splash and banner from the brand SVG |
-| `npm run package` | Writes `build/BitChord-<version>-unsigned.wgt` |
-
-Tests use Chrome at `C:/Program Files/Google/Chrome/Application/chrome.exe`; set `CHROME` to use another.
-
-## Docs
-
-| Doc | What it covers |
-|---|---|
-| [docs/FEATURE_MATRIX.md](docs/FEATURE_MATRIX.md) | Every PC feature on PC, Android TV and Tizen, and why anything is missing |
-| [docs/DESIGN_SPEC.md](docs/DESIGN_SPEC.md) | Colour, type, shape, motion, backdrop and lyric values from the PC source |
-| [docs/WORKFLOWS.md](docs/WORKFLOWS.md) | Each flow, key by key |
-| [docs/PARITY.md](docs/PARITY.md) | Done, Partial, Not possible, Removed |
-| [docs/PERFORMANCE.md](docs/PERFORMANCE.md) | Start-up, frame rate and memory, and how to measure on the TV |
-| [docs/STORE_SUBMISSION.md](docs/STORE_SUBMISSION.md) | Why to sideload rather than submit, and the store assets |
-
-## Sign-in: an open question
-
-The PC app signs in through a browser window, then sends Google's session cookie with every request. A Tizen web app can't do that: JavaScript may not set a `Cookie` header, and the app can't run the small local server Android TV uses for phone pairing. Account features (synced library, likes, history, personalized Home) need a different route, so that decision is still open.
-
-## Licence
-
-GPL-3.0, the same as BitChord. A port of BitChord by jackychan4891 (PC) and kushagrasinghx (Android, TV and web).
+- **BitChord:** a port of BitChord by jackychan4891 (PC) and kushagrasinghx (Android, TV and web).
 - **Fonts:** Inter and Figtree (SIL Open Font License).
-- **Icons:** Lucide (ISC).
+- **Icons:** Lucide (ISC License).
 
-Music, artwork and metadata come from YouTube Music; lyrics come from Unison, lrc.red and LRCLIB. This project isn't affiliated with Google, YouTube or Samsung.
+## License
+
+[GPL-3.0](LICENSE), the same licence as BitChord.
+
+This project is not affiliated with Google, YouTube or Samsung. YouTube Music provides the music, artwork and metadata.

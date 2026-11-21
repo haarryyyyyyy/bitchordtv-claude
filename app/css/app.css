@@ -259,7 +259,7 @@ img { display: block; }
 .side-item.focused::before { opacity: 1; }
 .side-item.focused .ic { color: var(--on-text); }
 .side-empty { color: var(--faint); font-size: 24px; padding: 8px 0; }
-.top-row { display: flex; align-items: flex-start; }
+.top-row { display: flex; align-items: flex-start; margin-top: 28px; } /* room for the focused card's scale and ring */
 .top-songs { flex: 1; min-width: 0; margin: 0 0 0 16px; max-width: 1100px; }
 
 /* Settings */
@@ -336,8 +336,15 @@ img { display: block; }
 #np-host { position: absolute; left: 0; top: 0; z-index: 2; }
 .np { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: flex; padding: 0 120px; opacity: 0; visibility: hidden; transition: opacity 300ms var(--ease-out), visibility 0s linear 300ms; }
 .np-open .np { opacity: 1; visibility: visible; transition: opacity 300ms var(--ease-out); }
-.np-left { width: 480px; flex: none; padding-top: 64px; margin-right: 112px; transition: transform 420ms var(--ease-out); }
-.panel-off .np-left { transform: translate3d(600px, 0, 0); } /* centred: (1920 - 480) / 2 - 120 */
+.np-left { width: 480px; flex: none; padding-top: 64px; margin-right: 112px; }
+/* Lyrics off: a large cover on the left, the details and controls beside it, centred. */
+.panel-off .np-left { width: 100%; margin: 0; padding: 0; height: 1080px; display: flex; align-items: center; justify-content: center; animation: np-in 260ms var(--ease-out); }
+.panel-off .np-cover, .panel-off .np-cover-img { width: 560px; height: 560px; }
+.panel-off .np-info { width: 640px; margin-left: 96px; }
+.panel-off .np-title { margin-top: 0; font-size: 56px; line-height: 1.1; letter-spacing: -0.02em; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.panel-off .np-artist { margin-top: 12px; font-size: 30px; }
+.panel-off .np-album { font-size: 24px; }
+@keyframes np-in { from { opacity: 0; } to { opacity: 1; } }
 .panel-off .np-right { display: none; }
 .np-cover { width: 480px; height: 480px; border-radius: 20px; overflow: hidden; background: rgba(255, 255, 255, 0.08); box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5); transition: transform 420ms var(--ease-out); }
 .np-cover-img { width: 480px; height: 480px; object-fit: cover; opacity: 0; transition: opacity 450ms var(--ease-out); }
@@ -349,7 +356,7 @@ img { display: block; }
 
 /* Seek bar: a knob marks where you are; focused, the played part and knob take the accent. */
 .np-progress { margin-top: 28px; padding: 14px 0 4px; }
-.np-bar { position: relative; width: 480px; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.24); }
+.np-bar { position: relative; width: 100%; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.24); }
 .np-bar .np-fill { border-radius: 3px; transition: transform 250ms linear, background-color 150ms var(--ease-out); }
 .np-knob { position: absolute; left: 0; top: 3px; width: 0; height: 0; transition: transform 250ms linear; }
 .np-knob::before { content: ''; position: absolute; left: -8px; top: -8px; width: 16px; height: 16px; border-radius: 50%; background: var(--text); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45); transition: transform 150ms var(--ease-out), background-color 150ms var(--ease-out); }
@@ -368,17 +375,20 @@ img { display: block; }
 .np-transport .btn-icon .ic { font-size: 32px; }
 .np-transport .np-play { width: 96px; height: 96px; border-radius: 48px; background: rgba(255, 255, 255, 0.16); }
 .np-transport .np-play .ic { font-size: 44px; }
-/* Shuffle and repeat show "on" with a tinted disc and the accent, not colour alone. */
-.np .btn-icon.on { background: rgba(255, 255, 255, 0.14); color: var(--accent-np); }
+/* Shuffle, repeat and Like show "on" with the accent and a dot under the icon: never colour alone. */
+.np .btn-icon.on { color: var(--accent-np); }
+.np .btn-icon.on::before { content: ''; position: absolute; left: 50%; bottom: 7px; width: 6px; height: 6px; margin-left: -3px; border-radius: 3px; background: currentColor; }
 .np .btn-icon.focused, .np .btn-icon.on.focused { background: var(--text); color: var(--on-text); transform: scale(1.08); }
 
 /* Row 2: Lyrics and Up next toggles, then Like and the sleep timer. */
-.np-actions { display: flex; align-items: center; margin-top: 20px; }
-.np-pill { height: 56px; padding: 0 22px; margin-right: 16px; font-size: 22px; font-weight: 600; background: rgba(255, 255, 255, 0.12); }
+.np-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; }
+.np-group { display: flex; align-items: center; }
+.np-pill { height: 56px; padding: 0 24px; margin-right: 12px; font-size: 22px; font-weight: 600; background: rgba(255, 255, 255, 0.12); }
 .np-pill .ic { font-size: 24px; }
 .np-pill.on { background: rgba(255, 255, 255, 0.28); }
 .np-pill.focused { background: var(--text); color: var(--on-text); }
-.np-actions .btn-icon { width: 56px; height: 56px; margin-right: 16px; background: rgba(255, 255, 255, 0.12); }
+.np-actions .btn-icon { width: 56px; height: 56px; margin: 0 0 0 12px; background: rgba(255, 255, 255, 0.12); }
+.np-actions .btn-icon.on::before { bottom: 5px; }
 .np-actions .btn-icon .ic { font-size: 26px; }
 
 /* Focus captions: an icon button names itself while focused. */
@@ -388,7 +398,7 @@ img { display: block; }
   transform: translate3d(-50%, -4px, 0); opacity: 0; transition: opacity 120ms var(--ease-out), transform 120ms var(--ease-out); pointer-events: none;
 }
 .btn-icon.focused::after { opacity: 1; transform: translate3d(-50%, 0, 0); }
-.np .btn-icon.focused::after { transform: translate3d(-50%, 0, 0) scale(0.926); } /* undo the 1.08 focus scale */
+.np .btn-icon::after { display: none; }
 
 .np-right { flex: 1; min-width: 0; position: relative; height: 1080px; }
 .lyrics { position: absolute; left: 0; top: 0; right: 0; height: 1080px; overflow: hidden;

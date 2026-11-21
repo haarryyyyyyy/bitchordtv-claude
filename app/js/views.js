@@ -64,7 +64,30 @@
         ctx.track.appendChild(ui.state('Nothing here yet', 'YouTube Music sent an empty home feed. Try again, or search for something to play.', { label: 'Search', icon: 'search', run: function () { BC.app.go('search'); } }));
         return;
       }
-      var loading = false;
+      var loading = false, heroDone = false;
+      /** Songs first, then shelves of songs, albums and artists, then playlist shelves. */
+      function rank(sh) {
+        if (sh.kind === 'songs') return 0;
+        var songish = sh.items.filter(function (c) { return c.target.kind !== 'playlist'; }).length;
+        return songish * 2 >= sh.items.length ? 1 : 2;
+      }
+      function ordered(list) {
+        return list.map(function (sh, i) { return { sh: sh, i: i }; })
+          .sort(function (x, y) { return rank(x.sh) - rank(y.sh) || x.i - y.i; })
+          .map(function (x) { return x.sh; });
+      }
+      function make(sh) {
+        // The first card shelf gets the large hero cards.
+        var hero = !heroDone && sh.kind === 'cards';
+        if (hero) heroDone = true;
+        var sec = ui.shelf(sh, 'shelf:' + sh.title, { hero: hero });
+        // Focus nearing the last shelves loads the next page of the feed (home_more).
+        sec.__near = function () {
+          var all = ctx.track.querySelectorAll('.shelf');
+          if (Array.prototype.indexOf.call(all, sec) >= all.length - 3) more();
+        };
+        return sec;
+      }
       function add(shelves, spread) {
         // Shelves from a continuation go in one per frame, so a held arrow never stalls.
         if (spread && shelves.length > 1) {
@@ -72,16 +95,7 @@
           BC.later(function () { if (ctx.alive()) add(shelves.slice(1), true); });
           return;
         }
-        shelves.forEach(function (s) {
-          var i = ctx.track.querySelectorAll('.shelf').length;
-          var sec = ui.shelf(s, 'shelf:' + s.title, { hero: i === 0 });
-          // Focus nearing the last shelves loads the next page of the feed (home_more).
-          sec.__near = function () {
-            var all = ctx.track.querySelectorAll('.shelf');
-            if (Array.prototype.indexOf.call(all, sec) >= all.length - 3) more();
-          };
-          ctx.track.appendChild(sec);
-        });
+        shelves.forEach(function (sh) { ctx.track.appendChild(make(sh)); });
       }
       function more() {
         if (loading || !d.continuation) return;
@@ -89,14 +103,36 @@
         BC.yt.homeMore(d.continuation).then(function (m) {
           d.continuation = m.continuation;
           d.shelves = d.shelves.concat(m.shelves);
-          if (ctx.alive()) add(m.shelves, true);
+          if (ctx.alive()) add(ordered(m.shelves), true);
           loading = false;
         }, function () { loading = false; });
       }
-      add(d.shelves);
+
+      // Without a YouTube account, Home learns from what was played on this TV:
+      // "Picked for you" is the radio of the last song, "Listen again" the history.
+      var history = p.params ? [] : BC.library.history();
+      if (history.length) {
+        if (d.picks) add([d.picks]);
+        add([{ title: 'Listen again', strapline: 'Played on this TV', kind: 'songs', items: history.slice(0, 16), rows: 4 }]);
+        if (!d.picks) {
+          var seed = history[0];
+          var played = {};
+          history.slice(0, 60).forEach(function (t) { played[t.id] = true; });
+          BC.yt.radio(seed.id, 30).then(function (tracks) {
+            var fresh = tracks.filter(function (t) { return !played[t.id]; }).slice(0, 20);
+            if (!fresh.length || !ctx.alive()) return;
+            d.picks = { title: 'Picked for you', strapline: 'Based on ' + seed.title, kind: 'songs', items: fresh, rows: 4 };
+            var first = ctx.track.querySelector('.shelf');
+            ctx.track.insertBefore(make(d.picks), first);
+            var f = BC.nav.focused();
+            if (f && ctx.track.contains(f)) BC.nav.reveal(f, true); // keep focus in view after the insert
+          }, function () {});
+        }
+      }
+      add(ordered(d.shelves));
       ctx.onFocus = function (f) {
-        var s = f.closest && f.closest('.shelf');
-        if (s && s.__near) s.__near();
+        var sh = f.closest && f.closest('.shelf');
+        if (sh && sh.__near) sh.__near();
       };
     });
   };

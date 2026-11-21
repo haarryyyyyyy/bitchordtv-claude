@@ -3,7 +3,7 @@
   'use strict';
   var BC = root.BC;
   var el = BC.el;
-  BC.VERSION = '0.3.0';
+  BC.VERSION = '0.4.0';
 
   // Remote keys (Samsung TV key codes; arrows, Enter and Escape also work on a PC keyboard).
   var KEYS = {

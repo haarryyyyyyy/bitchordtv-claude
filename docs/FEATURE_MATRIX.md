@@ -14,11 +14,11 @@ PC sources are under `ref/pc/src`. "Android TV" is read from `tv/src/**`.
 | Screen | PC | Android TV | Tizen | Notes |
 |---|---|---|---|---|
 | Splash | — | TvStartup | Removed | Felt laggy on the test TV. Home opens at once with its loading skeleton; the brand mark sits in the sidebar. |
-| Home: mood chips, shelves, quick picks, continuation | `pages.rs::home`, `ytm.rs::home/home_more` | TvHomeScreen | Done | Chips re-request the feed with the chip's `params`. More shelves load as focus nears the end. |
+| Home: mood chips, shelves, quick picks, continuation | `pages.rs::home`, `ytm.rs::home/home_more` | TvHomeScreen | Done | Chips re-request the feed with the chip's `params`. More shelves load as focus nears the end. Song shelves come before playlist shelves. Without an account, "Picked for you" (the radio of the last song played) and "Listen again" (history on the TV) lead the feed. |
 | New: new releases, top songs, charts | `pages.rs::new` | TvExploreScreen | Done | `FEmusic_new_releases_albums` and `FEmusic_charts` (US). |
 | Moods & genres | Home chips | TvExploreScreen | Done | `FEmusic_moods_and_genres` tiles open a browse page. |
 | Search with suggestions and history | `pages.rs` search, `ytm.rs::suggestions` | TvSearchScreen | Done | Custom on-screen keyboard. History is stored on the TV. |
-| Search results by kind | `search_cards`, filters | TvSearchScreen | Done | Top result plus Songs, Albums, Artists and Playlists rows. |
+| Search results by kind | `search_cards`, filters | TvSearchScreen | Done | Songs come from the songs-only filter, so music videos and podcast episodes never appear; a video top result is dropped. Albums, Artists and Playlists rows follow. |
 | Album | `ytm.rs::album` | TvDetailScreen | Done | Music-video rows are swapped for their song versions on PC; on TV they play as listed (see Partial below). |
 | Playlist | `ytm.rs::playlist` | TvDetailScreen | Done | First page plus continuation, capped at 500 tracks for mixes, as on PC. |
 | Artist | `ytm.rs::artist` | TvArtistPage | Done | Banner, top songs, albums, singles, playlists, similar artists. |

@@ -5,7 +5,7 @@
   var BC = root.BC;
   var el = BC.el;
   // karaoke.rs: lines lead the audio slightly so they light up as they are sung.
-  var BAR_W = 480; // .np-bar width in app.css
+  var barW = 0; // the seek bar's width, measured after each layout change
   var LINE_OFFSET = 115, WORD_OFFSET = 150, ANCHOR = 0.43, USER_SCROLL_RESUME = 25000, GAP_MS = 5000;
 
   var autoQueue = false; // Up next was opened because the song had no lyrics
@@ -26,13 +26,16 @@
     parts.coverImg.alt = '';
     parts.cover.appendChild(parts.coverImg);
     left.appendChild(parts.cover);
+    // Everything but the cover, so "lyrics off" can set it beside a large cover.
+    var info = el('div', 'np-info');
+    left.appendChild(info);
     parts.title = el('div', 'np-title');
     parts.artist = el('div', 'np-artist');
     parts.album = el('div', 'np-album');
     parts.quality = el('div', 'np-quality');
-    left.appendChild(parts.title);
-    left.appendChild(parts.artist);
-    left.appendChild(parts.album);
+    info.appendChild(parts.title);
+    info.appendChild(parts.artist);
+    info.appendChild(parts.album);
 
     // Seek bar: a knob marks the position. Focused, it turns the accent colour and Left /
     // Right seek 10 s, with the hint shown in place of the quality label.
@@ -61,7 +64,8 @@
       return false;
     };
     prog.onActivate = function () { BC.player.toggle(); };
-    left.appendChild(prog);
+    parts.bar = bar;
+    info.appendChild(prog);
 
     var ui = BC.ui;
     // Row 1: playback. Play in the middle, the largest target.
@@ -75,7 +79,7 @@
     parts.next = ui.iconButton('next', 'Next', BC.player.next, 'next');
     parts.repeat = ui.iconButton('repeat', 'Repeat', function () { BC.toast({ off: 'Repeat off', all: 'Repeat all', one: 'Repeat one' }[BC.player.cycleRepeat()]); }, 'repeat');
     [parts.shuffle, parts.prev, parts.play, parts.next, parts.repeat].forEach(function (b) { row.appendChild(b); });
-    left.appendChild(row);
+    info.appendChild(row);
 
     // Row 2: what the right side shows, then the song's own actions.
     var row2 = el('div', 'np-actions');
@@ -89,8 +93,12 @@
       paintState();
     }, 'like');
     parts.sleep = ui.iconButton('moon', 'Sleep timer', sleepMenu, 'sleep');
-    [parts.lyricsBtn, parts.queueBtn, parts.like, parts.sleep].forEach(function (b) { row2.appendChild(b); });
-    left.appendChild(row2);
+    // Panel toggles on the left edge, song actions on the right edge: both rows share the column edges.
+    var views = el('div', 'np-group'), acts = el('div', 'np-group');
+    views.appendChild(parts.lyricsBtn); views.appendChild(parts.queueBtn);
+    acts.appendChild(parts.like); acts.appendChild(parts.sleep);
+    row2.appendChild(views); row2.appendChild(acts);
+    info.appendChild(row2);
 
     var right = el('div', 'np-right');
     parts.right = right;
@@ -130,6 +138,8 @@
     parts.queueBtn.setAttribute('aria-pressed', String(which === 'queue'));
     if (which === 'queue') renderQueue();
     if (which === 'lyrics') tick(true);
+    barW = 0;
+    paintTime();
   }
   /** The pills are toggles: pressing the shown panel's pill hides it. */
   function toggle(which) { autoQueue = false; show(panel === which ? null : which); }
@@ -171,8 +181,9 @@
     if (!open) return;
     var at = BC.player.time(), d = BC.player.duration();
     var f = d ? Math.min(1, at / d) : 0;
+    if (!barW) barW = parts.bar.offsetWidth || 480; // 480 beside lyrics, 640 with lyrics off
     parts.fill.style.transform = 'scaleX(' + f + ')';
-    parts.knob.style.transform = 'translate3d(' + Math.round(f * BAR_W) + 'px,0,0)';
+    parts.knob.style.transform = 'translate3d(' + Math.round(f * barW) + 'px,0,0)';
     parts.at.textContent = BC.fmtTime(at);
     parts.left.textContent = '−' + BC.fmtTime(Math.max(0, d - at));
   }

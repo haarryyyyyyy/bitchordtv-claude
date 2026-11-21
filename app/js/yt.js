@@ -571,7 +571,21 @@
     },
     homeMore: function (token) { return api().ytm('browse', { continuation: token }).then(parseHomeMore); },
     suggestions: function (input) { return api().ytm('music/get_search_suggestions', { input: input }).then(parseSuggestions); },
-    search: function (query) { return api().ytm('search', { query: query }).then(parseSearch); },
+    /** Search: the All tab for albums, artists and playlists; songs from the songs-only filter,
+     *  so music videos, uploads and podcast episodes never appear as songs. */
+    search: function (query) {
+      return Promise.all([
+        api().ytm('search', { query: query }).then(parseSearch),
+        api().ytm('search', { query: query, params: FILTERS.songs }).then(function (v) { return parseSearch(v).songs; }, function () { return null; })
+      ]).then(function (r) {
+        var all = r[0];
+        if (r[1]) all.songs = r[1];
+        all.videos = [];
+        // A top result that is a video or an episode isn't a song: drop it.
+        if (all.top && /^(Video|Episode|Podcast)/.test(all.top.subtitle)) all.top = null;
+        return all;
+      });
+    },
     searchSongs: function (query) {
       return api().ytm('search', { query: query, params: FILTERS.songs }).then(function (v) { return parseSearch(v).songs; });
     },
