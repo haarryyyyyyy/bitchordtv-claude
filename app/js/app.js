@@ -1,21 +1,20 @@
-/* App shell: splash, sidebar, router with history, mini player and remote keys. */
+/* App shell: sidebar, router with history, mini player and remote keys. */
 (function (root) {
   'use strict';
   var BC = root.BC;
   var el = BC.el;
-  BC.VERSION = '0.2.0';
+  BC.VERSION = '0.3.0';
 
   // Remote keys (Samsung TV key codes; arrows, Enter and Escape also work on a PC keyboard).
   var KEYS = {
     37: 'left', 38: 'up', 39: 'right', 40: 'down', 13: 'ok',
     10009: 'back', 27: 'back', 8: 'back',
     10252: 'playpause', 415: 'play', 19: 'pause', 413: 'stop', 417: 'ff', 412: 'rewind',
-    10233: 'next', 10232: 'prev',
-    403: 'red', 404: 'green', 405: 'yellow', 406: 'blue'
+    10233: 'next', 10232: 'prev'
   };
   for (var d = 0; d <= 9; d++) KEYS[48 + d] = 'digit' + d;
   var TIZEN_KEYS = ['MediaPlayPause', 'MediaPlay', 'MediaPause', 'MediaStop', 'MediaFastForward', 'MediaRewind',
-    'MediaTrackNext', 'MediaTrackPrevious', 'ColorF0Red', 'ColorF1Green', 'ColorF2Yellow', 'ColorF3Blue',
+    'MediaTrackNext', 'MediaTrackPrevious',
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
   var NAV = [
@@ -118,10 +117,8 @@
     open.appendChild(art); open.appendChild(text);
     open.onActivate = function () { BC.nowPlaying.open(art.getBoundingClientRect()); };
     m.appendChild(open);
-    var prev = BC.ui.iconButton('prev', 'Previous', BC.player.prev, 'prev');
     var play = BC.ui.iconButton('play', 'Play', BC.player.toggle, 'play');
-    var next = BC.ui.iconButton('next', 'Next', BC.player.next, 'next');
-    m.appendChild(prev); m.appendChild(play); m.appendChild(next);
+    m.appendChild(play);
     var bar = el('div', 'mini-bar'), fill = el('div', 'mini-fill');
     bar.appendChild(fill);
     m.appendChild(bar);
@@ -139,6 +136,7 @@
       var p = BC.player.playing();
       play.querySelector('.ic').textContent = BC.ICON[p ? 'pause' : 'play'];
       play.setAttribute('aria-label', p ? 'Pause' : 'Play');
+      play.setAttribute('data-label', p ? 'Pause' : 'Play');
       m.classList.toggle('loading', BC.player.loading());
     });
     BC.on('time', function (t) {
@@ -251,7 +249,6 @@
     var name = KEYS[e.keyCode];
     if (!name) return;
     e.preventDefault();
-    if (document.body.classList.contains('splash-on')) return;
     var f = BC.nav.focused();
 
     if (name === 'ok') {
@@ -312,23 +309,6 @@
   }
 
   // ---- Boot -------------------------------------------------------------------------------
-  function splash(done) {
-    var s = document.getElementById('splash');
-    var mark = s.querySelector('.splash-mark-host');
-    mark.innerHTML = logoSvg('splash-mark');
-    // Split the mark's three arcs so they can draw in one after another.
-    var g = mark.querySelector('g');
-    g.innerHTML = BC.ARCS.map(function (d, i) { return '<path class="arc arc' + i + '" d="' + d + '"/>'; }).join('');
-    document.body.classList.add('splash-on');
-    var total = BC.reducedMotion() ? 400 : 1400;
-    setTimeout(function () {
-      s.classList.add('out');
-      document.body.classList.remove('splash-on');
-      done();
-      setTimeout(function () { s.remove(); }, 400);
-    }, total);
-  }
-
   /** Scale the 1920×1080 stage to the viewport the TV reports, centred. */
   function fit() {
     var w = root.innerWidth || 1920, h = root.innerHeight || 1080;
@@ -360,10 +340,9 @@
       BC.nowPlaying.open(art ? art.getBoundingClientRect() : null);
     });
     BC.on('accent', function (c) { document.documentElement.style.setProperty('--accent-np', c || ''); document.body.classList.toggle('has-accent', !!c); });
-    // Start loading Home behind the splash, so it is ready when the splash ends.
+    // Home opens at once with its skeleton; ?view=<name> opens another page (tests).
     var url = root.location ? root.location.search : '';
     var startView = (/[?&]view=(\w+)/.exec(url) || [])[1] || 'home';
-    splash(settle);
     open(startView, {});
     stack = [stack[stack.length - 1]];
   }

@@ -1,6 +1,6 @@
 # Workflows
 
-Remote keys: arrows, OK, Back, Play/Pause, Play, Pause, Stop, Fast-forward, Rewind, the four color keys and 0–9. The app doesn't use the Voice key: no voice API for web apps has been tested on a TV yet.
+Remote keys: arrows, OK, Back, Play/Pause, Play, Pause, Stop, Fast-forward, Rewind and 0–9. The app doesn't rely on the colour keys, which many remotes lack. The app doesn't use the Voice key: no voice API for web apps has been tested on a TV yet.
 
 ## Global keys
 
@@ -14,7 +14,7 @@ Remote keys: arrows, OK, Back, Play/Pause, Play, Pause, Stop, Fast-forward, Rewi
 
 ## Start
 
-1. The splash plays (under 1.5 s) while a WEB_REMIX `FEmusic_home` browse runs, which also returns the visitor data.
+1. Home opens at once with its loading skeleton while a WEB_REMIX `FEmusic_home` browse runs, which also returns the visitor data.
 2. Home opens with focus on the first card of the first shelf.
 3. If the browse fails, the connection check opens and shows each route's result.
 
@@ -41,10 +41,6 @@ The page shows new releases, then top songs (four-row grid), then charts playlis
 
 | Key | Effect |
 |---|---|
-| Red | Shift |
-| Green | Clear |
-| Yellow | Space |
-| Blue | Search |
 | 0–9 | Type the digit |
 | Rewind / Fast-forward | Move the cursor |
 | OK held | Repeats a character key |
@@ -75,7 +71,9 @@ The page shows the banner and name, then Play top songs and Start radio. Below t
 
 | Area | Behaviour |
 |---|---|
-| Layout | Cover, title, progress and transport on the left. On the right, **Lyrics** and **Up next** tabs sit above the panel. |
+| Layout | Every control is in the left column, below the cover: the seek bar, then Shuffle, Previous, Play, Next, Repeat, then the **Lyrics** and **Up next** toggles, Like and Sleep timer. The right side shows lyrics or the queue. |
+| Seek bar | Up from the controls focuses it. The played part and the knob turn the cover's accent colour, and Left / Right seek 10 s. |
+| Lyrics / Up next | Each toggle shows its panel; pressing the one already shown hides the panel and centres the cover. |
 | Default | Lyrics, when the track has any. |
 | Up (from the transport row) | Moves into the lyrics or queue panel. |
 | Transport row | Shuffle, Previous, Play/Pause, Next, Repeat, then Lyrics / Up next toggle, Like and the sleep timer. |

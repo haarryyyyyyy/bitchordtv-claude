@@ -93,6 +93,8 @@ The scale is 8, 12, 16, 24, 32, 48, 64 and 96.
 
 **Focus** (**TV**): the card scales to 1.06 over 150 ms (`--ease-out`), and its title moves down 14 px to clear it. A 4 px ring in `--text` (#F2F0F5) sits 8 px outside the art. White, not the accent, stays visible on pink covers. Rows, buttons and menu items fill with `--text` and switch to dark text. Only transform and opacity animate; the ring is a pseudo-element faded by opacity, so nothing reflows.
 
+**Splash:** none since 0.3.0; it felt laggy on the test TV. Home shows its skeleton at once.
+
 **Page change:** the new page rises 24 px with opacity over 300 ms (×0.65 ≈ 200 ms). On Back the old page drops away the same way (spatial consistency).
 
 **Cover to Now Playing:** the mini-player art scales and translates into the Now Playing cover position (a FLIP transform), 420 ms `--ease-out`, while the backdrop fades in.

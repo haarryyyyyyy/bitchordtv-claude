@@ -66,7 +66,7 @@ test('a layer traps focus and returns it when popped', async () => {
   assert.strictEqual(await key(), 'b1');
 });
 
-test('keyboard: typing, cursor keys, color keys, layouts', async () => {
+test('keyboard: typing, cursor keys, digits, layouts', async () => {
   const r = await page.evaluate(() => {
     const out = [];
     let text = '';
@@ -75,12 +75,12 @@ test('keyboard: typing, cursor keys, color keys, layouts', async () => {
     kb._insert('a'); kb._insert('c');
     kb.handleKey('rewind'); kb._insert('b');            // cursor moved left: a|c -> abc
     out.push(text, kb.cursor());
-    kb.handleKey('yellow'); kb.handleKey('digit7');      // space and a digit
+    kb._insert(' '); kb.handleKey('digit7');             // space and a digit
     out.push(text);
     kb.handleKey('ff'); kb._backspace();
     out.push(text);
-    kb.handleKey('green'); out.push('[' + text + ']');  // clear
-    kb.setText('x'); kb.handleKey('blue');
+    kb.setText(''); out.push('[' + kb.text() + ']');      // clear
+    kb.setText('x'); kb.querySelector('[data-key=go]').onActivate();
     out.push(Object.keys(BC.Keyboard.LAYOUTS).join(','));
     out.push(kb.querySelectorAll('.kb-key').length > 40);
     return out;

@@ -1,8 +1,7 @@
 /* Full-screen on-screen keyboard for a remote.
  * Keys are .fx items in rows (data-nav="h") inside a column (data-nav="v"), so the nav
- * engine moves between them by position. Color keys: red Shift, green Clear, yellow Space,
- * blue Search. Number keys type digits. Rewind / Fast-forward move the cursor. Character
- * keys and Delete repeat while OK is held (el.repeat). */
+ * engine moves between them by position. Number keys type digits; Rewind / Fast-forward
+ * move the cursor. Character keys and Delete repeat while OK is held (el.repeat). */
 (function (root) {
   'use strict';
   var BC = root.BC;
@@ -36,16 +35,8 @@
     var keys = BC.el('div', 'kb-keys');
     keys.setAttribute('data-nav', 'v');
     keys.setAttribute('data-key', 'keys');
-    var legend = BC.el('div', 'kb-legend');
-    [['red', 'Shift'], ['green', 'Clear'], ['yellow', 'Space'], ['blue', 'Search']].forEach(function (p) {
-      var s = BC.el('span', 'kb-legend-item');
-      s.appendChild(BC.el('i', 'dot dot-' + p[0]));
-      s.appendChild(document.createTextNode(p[1]));
-      legend.appendChild(s);
-    });
     el.appendChild(field);
     el.appendChild(keys);
-    el.appendChild(legend);
 
     function paint() {
       before.textContent = text.slice(0, cursor);
@@ -115,10 +106,6 @@
     /** Remote keys while the keyboard is on screen; true when handled. */
     el.handleKey = function (name) {
       switch (name) {
-        case 'red': shift = !shift; build(); return true;
-        case 'green': text = ''; cursor = 0; changed(); return true;
-        case 'yellow': insert(' '); return true;
-        case 'blue': if (opts.onSubmit) opts.onSubmit(text); return true;
         case 'rewind': if (cursor > 0) { cursor--; paint(); } return true;
         case 'ff': if (cursor < text.length) { cursor++; paint(); } return true;
       }
